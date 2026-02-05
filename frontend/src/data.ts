@@ -1,0 +1,133 @@
+import p1 from "./assets/p1.png";
+import p2 from "./assets/p2.png";
+import p3 from "./assets/p3.png";
+import p4 from "./assets/p4.png";
+import p5 from "./assets/p5.png";
+import p6 from "./assets/p6.png";
+
+export const Products = [
+  {
+    image: p1,
+    id: "prod_001",
+    brand: "TOM FORD",
+    name: "Lost Cherry",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 326.0,
+    currency: "USD",
+    isWishlisted: false,
+    variants: [
+      { size: "30 ml", available: true },
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p2,
+    id: "prod_002",
+    brand: "MOSCHINO",
+    name: "Toy Boy",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 43.12,
+    currency: "USD",
+    isWishlisted: true,
+    variants: [
+      { size: "30 ml", available: true },
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p3,
+    id: "prod_003",
+    brand: "FILIPPO SORCINELLI",
+    name: "Epicentro",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 326.0,
+    currency: "USD",
+    isWishlisted: false,
+    variants: [
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p4,
+    id: "prod_004",
+    brand: "DIOR",
+    name: "Sauvage",
+    category: "Perfume",
+    type: "Eau de Toilette",
+    price: 120.0,
+    currency: "USD",
+    isWishlisted: false,
+    variants: [
+      { size: "60 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p5,
+    id: "prod_005",
+    brand: "YVES SAINT LAURENT",
+    name: "Y",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 145.0,
+    currency: "USD",
+    isWishlisted: true,
+    variants: [
+      { size: "60 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p6,
+    id: "prod_006",
+    brand: "CREED",
+    name: "Aventus",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 365.0,
+    currency: "USD",
+    isWishlisted: false,
+    variants: [
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p1,
+    id: "prod_001",
+    brand: "TOM FORD",
+    name: "Lost Cherry",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 326.0,
+    currency: "USD",
+    isWishlisted: false,
+    variants: [
+      { size: "30 ml", available: true },
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+  {
+    image: p2,
+    id: "prod_002",
+    brand: "MOSCHINO",
+    name: "Toy Boy",
+    category: "Perfume",
+    type: "Eau de Parfum",
+    price: 43.12,
+    currency: "USD",
+    isWishlisted: true,
+    variants: [
+      { size: "30 ml", available: true },
+      { size: "50 ml", available: true },
+      { size: "100 ml", available: true },
+    ],
+  },
+];
