@@ -15,7 +15,7 @@ let Product = class Product {
     name;
     brand;
     description;
-    productImage; // 👈 SINGLE IMAGE
+    productImage;
     isActive;
     variants;
 };

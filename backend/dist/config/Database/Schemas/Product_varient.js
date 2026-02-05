@@ -13,10 +13,10 @@ import {} from "typeorm";
 let ProductVariant = class ProductVariant {
     id;
     product;
-    size; // 50ml, 100ml
+    size;
     price;
     stock;
-    isDefault; // 👈 default size
+    isDefault;
 };
 __decorate([
     PrimaryGeneratedColumn(),

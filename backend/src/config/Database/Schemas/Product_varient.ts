@@ -20,7 +20,7 @@ export class ProductVariant {
   product!: Relation<Product>;
 
   @Column()
-  size!: string; // 50ml, 100ml
+  size!: string;
 
   @Column("decimal", {
     precision: 10,
@@ -32,5 +32,5 @@ export class ProductVariant {
   stock!: number;
 
   @Column({ default: false })
-  isDefault!: boolean; // 👈 default size
+  isDefault!: boolean;
 }

@@ -6,18 +6,43 @@ import { Order } from "../config/Database/Schemas/Orders.js";
 import { OrderStatus } from "../config/Database/Schemas/Order_Status_History.js";
 import { User } from "../config/Database/Schemas/User.js";
 import { Payment, PaymentStatus } from "../config/Database/Schemas/Payment.js";
-import Razorpay from "razorpay";
+import { OrderItem } from "../config/Database/Schemas/Order_Items.js";
+import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
+import { Address } from "../config/Database/Schemas/Adress.js";
 export const createOrder = async (req, res) => {
     const orderRepo = AppDataSource.getRepository(Order);
     const paymentRepo = AppDataSource.getRepository(Payment);
     const userRepo = AppDataSource.getRepository(User);
-    const { amount } = req.body;
-    const options = {
-        amount: amount * 100,
-        currency: "INR",
-        receipt: `receipt_${Date.now()}`,
-    };
+    const orderItemRepo = AppDataSource.getRepository(OrderItem);
+    const variantRepo = AppDataSource.getRepository(ProductVariant);
+    const addressRepo = AppDataSource.getRepository(Address);
     try {
+        const { addressId, items } = req.body;
+        // basic validation
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: "Items are required" });
+        }
+        let totalPrice = 0;
+        for (const item of items) {
+            const variant = await variantRepo.findOne({
+                where: { id: item.variantId },
+                relations: { product: true },
+            });
+            console.log(variant?.price);
+            if (!variant)
+                throw new Error("Variant not found");
+            if (variant.stock < item.quantity) {
+                throw new Error(`Insufficient stock for ${variant.product.name}`);
+            }
+            // price comes from DB, not request
+            totalPrice += Number(variant.price) * item.quantity;
+        }
+        console.log("CHECKING ================>", totalPrice);
+        const options = {
+            amount: totalPrice * 100,
+            currency: "INR",
+            receipt: `receipt_${Date.now()}`,
+        };
         const user = await userRepo.findOne({
             where: { id: 1 },
             relations: {
@@ -27,7 +52,11 @@ export const createOrder = async (req, res) => {
         if (!user || user.addresses.length === 0) {
             throw new Error("User or address not found");
         }
-        const address = user.addresses[0];
+        let address = await addressRepo.findOne({
+            where: {
+                id: addressId,
+            },
+        });
         if (!address) {
             throw new Error("Address not found for user");
         }
@@ -41,14 +70,35 @@ export const createOrder = async (req, res) => {
         });
         if (!order) {
             order = orderRepo.create({
-                user,
-                address,
+                user: {
+                    id: user.id,
+                },
+                address: {
+                    id: Number(address.id),
+                },
                 status: OrderStatus.PENDING,
-                totalAmount: amount,
+                totalAmount: Number(totalPrice),
             });
             await orderRepo.save(order);
         }
-        const strapiOrder = await PaymentGateway.getInstance().createOrder(amount, options.receipt);
+        const orderItems = [];
+        for (const item of items) {
+            const variant = await variantRepo.findOne({
+                where: { id: item.variantId },
+            });
+            if (!variant) {
+                throw new Error("Variant not found");
+            }
+            const orderItem = orderItemRepo.create({
+                order: { id: order.id }, // 👈 link order
+                variant: { id: variant.id }, // 👈 link variant
+                quantity: item.quantity,
+                price: variant.price, // 👈 snapshot price
+            });
+            orderItems.push(orderItem);
+        }
+        await orderItemRepo.save(orderItems);
+        const strapiOrder = await PaymentGateway.getInstance().createOrder(totalPrice, options.receipt);
         const payment = paymentRepo.create({
             order,
             provider: "razerpay",

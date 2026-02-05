@@ -10,8 +10,11 @@ import {
 } from "typeorm";
 
 import { type Relation } from "typeorm";
-
 import { OrderStatusHistory } from "./Order_Status_History.js";
+import { User } from "./User.js";
+import { Address } from "./Adress.js";
+import { Payment } from "./Payment.js";
+import { OrderItem } from "./Order_Items.js";
 
 export enum OrderStatus {
   PENDING = "PENDING",
@@ -21,10 +24,6 @@ export enum OrderStatus {
   CANCELLED = "CANCELLED",
 }
 
-import { User } from "./User.js";
-import { Address } from "./Adress.js";
-import { Payment } from "./Payment.js";
-
 @Entity("orders")
 export class Order {
   @PrimaryGeneratedColumn()
@@ -32,14 +31,17 @@ export class Order {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "user_id" })
-  user!: User;
+  user!: Relation<User>;
 
   @OneToOne(() => Payment, (payment) => payment.order)
   payment!: Relation<Payment>;
 
   @ManyToOne(() => Address)
   @JoinColumn({ name: "address_id" })
-  address!: Address;
+  address!: Relation<Address>;
+
+  @OneToMany(() => OrderItem, (item) => item.order)
+  orderItems!: Relation<OrderItem[]>;
 
   @Column({
     type: "enum",
@@ -50,6 +52,9 @@ export class Order {
 
   @OneToMany(() => OrderStatusHistory, (history) => history.order)
   statusHistory!: Relation<OrderStatusHistory[]>;
+
+  @Column({ default: false })
+  inventoryReduced!: boolean;
 
   @Column("decimal", { precision: 10, scale: 2 })
   totalAmount!: number;

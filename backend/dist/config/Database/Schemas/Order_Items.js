@@ -22,14 +22,16 @@ __decorate([
     __metadata("design:type", Number)
 ], OrderItem.prototype, "id", void 0);
 __decorate([
-    ManyToOne(() => Order),
+    ManyToOne(() => Order, (order) => order.orderItems, {
+        onDelete: "CASCADE",
+    }),
     JoinColumn({ name: "order_id" }),
-    __metadata("design:type", Order)
+    __metadata("design:type", Object)
 ], OrderItem.prototype, "order", void 0);
 __decorate([
     ManyToOne(() => ProductVariant),
     JoinColumn({ name: "variant_id" }),
-    __metadata("design:type", ProductVariant)
+    __metadata("design:type", Object)
 ], OrderItem.prototype, "variant", void 0);
 __decorate([
     Column(),

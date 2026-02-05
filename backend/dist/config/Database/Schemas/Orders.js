@@ -10,6 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, OneToMany, OneToOne, } from "typeorm";
 import {} from "typeorm";
 import { OrderStatusHistory } from "./Order_Status_History.js";
+import { User } from "./User.js";
+import { Address } from "./Adress.js";
+import { Payment } from "./Payment.js";
+import { OrderItem } from "./Order_Items.js";
 export var OrderStatus;
 (function (OrderStatus) {
     OrderStatus["PENDING"] = "PENDING";
@@ -18,16 +22,15 @@ export var OrderStatus;
     OrderStatus["DELIVERED"] = "DELIVERED";
     OrderStatus["CANCELLED"] = "CANCELLED";
 })(OrderStatus || (OrderStatus = {}));
-import { User } from "./User.js";
-import { Address } from "./Adress.js";
-import { Payment } from "./Payment.js";
 let Order = class Order {
     id;
     user;
     payment;
     address;
+    orderItems;
     status;
     statusHistory;
+    inventoryReduced;
     totalAmount;
     createdAt;
 };
@@ -38,7 +41,7 @@ __decorate([
 __decorate([
     ManyToOne(() => User),
     JoinColumn({ name: "user_id" }),
-    __metadata("design:type", User)
+    __metadata("design:type", Object)
 ], Order.prototype, "user", void 0);
 __decorate([
     OneToOne(() => Payment, (payment) => payment.order),
@@ -47,8 +50,12 @@ __decorate([
 __decorate([
     ManyToOne(() => Address),
     JoinColumn({ name: "address_id" }),
-    __metadata("design:type", Address)
+    __metadata("design:type", Object)
 ], Order.prototype, "address", void 0);
+__decorate([
+    OneToMany(() => OrderItem, (item) => item.order),
+    __metadata("design:type", Object)
+], Order.prototype, "orderItems", void 0);
 __decorate([
     Column({
         type: "enum",
@@ -61,6 +68,10 @@ __decorate([
     OneToMany(() => OrderStatusHistory, (history) => history.order),
     __metadata("design:type", Object)
 ], Order.prototype, "statusHistory", void 0);
+__decorate([
+    Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Order.prototype, "inventoryReduced", void 0);
 __decorate([
     Column("decimal", { precision: 10, scale: 2 }),
     __metadata("design:type", Number)

@@ -20,7 +20,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD!,
   database: "ecomm",
   synchronize: true, // dev only
-  logging: true,
+  logging: false,
   entities: [
     Product,
     ProductVariant,

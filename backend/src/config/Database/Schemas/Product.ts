@@ -24,7 +24,7 @@ export class Product {
   description!: string;
 
   @Column({ nullable: true })
-  productImage!: string; // 👈 SINGLE IMAGE
+  productImage!: string;
 
   @Column({ default: true })
   isActive!: boolean;

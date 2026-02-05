@@ -1,5 +1,9 @@
 import { type Relation } from "typeorm";
 import { OrderStatusHistory } from "./Order_Status_History.js";
+import { User } from "./User.js";
+import { Address } from "./Adress.js";
+import { Payment } from "./Payment.js";
+import { OrderItem } from "./Order_Items.js";
 export declare enum OrderStatus {
     PENDING = "PENDING",
     PAID = "PAID",
@@ -7,16 +11,15 @@ export declare enum OrderStatus {
     DELIVERED = "DELIVERED",
     CANCELLED = "CANCELLED"
 }
-import { User } from "./User.js";
-import { Address } from "./Adress.js";
-import { Payment } from "./Payment.js";
 export declare class Order {
     id: number;
-    user: User;
+    user: Relation<User>;
     payment: Relation<Payment>;
-    address: Address;
+    address: Relation<Address>;
+    orderItems: Relation<OrderItem[]>;
     status: OrderStatus;
     statusHistory: Relation<OrderStatusHistory[]>;
+    inventoryReduced: boolean;
     totalAmount: number;
     createdAt: Date;
 }
