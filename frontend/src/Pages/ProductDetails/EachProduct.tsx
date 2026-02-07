@@ -32,7 +32,7 @@ const EachProduct = () => {
           <CommonButton>View all</CommonButton>
         </div>
 
-        <div className="flex">
+        {/* <div className="flex">
           {Products.slice(0, 3).map((product: Product) => (
             <ProductCard
               showPrice={false}
@@ -41,7 +41,7 @@ const EachProduct = () => {
               product={product}
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

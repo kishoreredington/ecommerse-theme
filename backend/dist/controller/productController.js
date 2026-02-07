@@ -4,6 +4,7 @@ import { Product } from "../config/Database/Schemas/Product.js";
 import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
 import fs from "fs";
 import { moveFile } from "../config/Database/multerConfig.js";
+import { Order } from "../config/Database/Schemas/Orders.js";
 export const getAllProducts = async (req, res) => {
     try {
         const productRepo = AppDataSource.getRepository(Product);
@@ -71,6 +72,35 @@ export const uploadProduct = async (req, res) => {
     }
     finally {
         await queryRunner.release();
+    }
+};
+export const getAllUserOrders = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ message: "No user Id" });
+        }
+        const orderRepo = AppDataSource.getRepository(Order);
+        const orders = await orderRepo.find({
+            where: { user: { id: userId || 1 } },
+            relations: {
+                orderItems: true,
+                payment: true,
+                address: true,
+                statusHistory: true,
+            },
+            order: {
+                createdAt: "DESC",
+            },
+        });
+        return res.status(200).json({
+            message: "Orders fetched successfully",
+            data: orders,
+        });
+    }
+    catch (error) {
+        console.error("GET USER ORDERS ERROR:", error);
+        return res.status(500).json({ message: "Something went wrong" });
     }
 };
 //# sourceMappingURL=productController.js.map

@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Menu, User, Search, ShoppingCart } from "lucide-react";
 import { Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNavigate = (link: string) => {
+    navigate(`/${link}`);
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 border-b-black">
@@ -56,6 +62,13 @@ const Header = () => {
             <button className="bg-black gap-3 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center space-x-2">
               <Typography>CART</Typography>
               <Typography>2</Typography>
+            </button>
+
+            <button
+              onClick={() => handleNavigate("orders")}
+              className="bg-black gap-3 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center space-x-2"
+            >
+              <Typography>Orders</Typography>
             </button>
           </div>
         </div>

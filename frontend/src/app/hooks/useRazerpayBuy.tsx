@@ -32,7 +32,19 @@ export const useRazorpayBuy = () => {
     prefill,
   }: BuyOptions) => {
     try {
-      const { strapiOrder, orderId } = await createOrder({ amount }).unwrap();
+      const { strapiOrder, orderId } = await createOrder({
+        addressId: 1,
+        items: [
+          {
+            variantId: 1,
+            quantity: 2,
+          },
+          {
+            variantId: 2,
+            quantity: 5,
+          },
+        ],
+      }).unwrap();
 
       console.log("CHECKING STRAPI ORDERS", strapiOrder);
 

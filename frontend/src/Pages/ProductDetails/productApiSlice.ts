@@ -8,7 +8,14 @@ export const productApiSlices = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    getAllOrders: builder.query({
+      query: () => ({
+        url: "/products/get-all-orders",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllProductsQuery } = productApiSlices;
+export const { useGetAllProductsQuery, useGetAllOrdersQuery } =
+  productApiSlices;

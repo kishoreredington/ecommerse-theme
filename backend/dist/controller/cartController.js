@@ -37,7 +37,6 @@ export const createOrder = async (req, res) => {
             // price comes from DB, not request
             totalPrice += Number(variant.price) * item.quantity;
         }
-        console.log("CHECKING ================>", totalPrice);
         const options = {
             amount: totalPrice * 100,
             currency: "INR",
@@ -114,35 +113,38 @@ export const createOrder = async (req, res) => {
 };
 export const verifyPayment = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    console.log("CHECKING PAYMENT RESULT");
     const isValid = PaymentGateway.getInstance().verifyPayment(razorpay_order_id, razorpay_payment_id, razorpay_signature);
     if (isValid) {
-        return res.status(200).json({ message: "Payment verified successfully" });
-    }
-    try {
-        const paymentRepo = AppDataSource.getRepository(Payment);
-        const orderRepo = AppDataSource.getRepository(Order);
-        const payment = await paymentRepo.findOne({
-            where: {
-                transactionId: razorpay_order_id,
-            },
-            relations: {
-                order: true,
-            },
-        });
-        if (!payment) {
-            return res.status(404).json({ message: "Payment record not found" });
+        try {
+            const paymentRepo = AppDataSource.getRepository(Payment);
+            const orderRepo = AppDataSource.getRepository(Order);
+            const payment = await paymentRepo.findOne({
+                where: {
+                    transactionId: razorpay_order_id,
+                },
+                relations: {
+                    order: true,
+                },
+            });
+            if (!payment) {
+                return res.status(404).json({ message: "Payment record not found" });
+            }
+            payment.status = PaymentStatus.SUCCESS;
+            payment.transactionId = razorpay_payment_id;
+            payment.order.status = OrderStatus.PAID;
+            await paymentRepo.save(payment);
+            await orderRepo.save(payment.order);
+            return res.status(200).json({
+                message: "Payment verified & order confirmed",
+                orderId: payment.order.id,
+            });
         }
-        payment.status = PaymentStatus.SUCCESS;
-        payment.transactionId = razorpay_payment_id;
-        payment.order.status = OrderStatus.PAID;
-        await paymentRepo.save(payment);
-        await orderRepo.save(payment.order);
-        return res.status(200).json({
-            message: "Payment verified & order confirmed",
-            orderId: payment.order.id,
-        });
+        catch (error) {
+            return res.status(400).json({ message: "verification failed" });
+        }
     }
-    catch (error) {
+    else {
         return res.status(400).json({ message: "verification failed" });
     }
 };
