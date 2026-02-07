@@ -76,13 +76,13 @@ export const uploadProduct = async (req, res) => {
 };
 export const getAllUserOrders = async (req, res) => {
     try {
-        const { userId } = req.body;
-        if (!userId) {
-            return res.status(400).json({ message: "No user Id" });
-        }
+        // const { userId } = req.body;
+        // if (!userId) {
+        //   return res.status(400).json({ message: "No user Id" });
+        // }
         const orderRepo = AppDataSource.getRepository(Order);
         const orders = await orderRepo.find({
-            where: { user: { id: userId || 1 } },
+            where: { user: { id: 1 } },
             relations: {
                 orderItems: true,
                 payment: true,

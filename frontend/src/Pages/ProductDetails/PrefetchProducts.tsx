@@ -6,7 +6,7 @@ import { store } from "../../app/store";
 const PrefetchProducts = () => {
   useEffect(() => {
     const products = store.dispatch(
-      productApiSlices.endpoints.getAllProducts.initiate(undefined),
+      productApiSlices.endpoints.getAllProducts.initiate({ userId: 1 }),
     );
 
     return () => {

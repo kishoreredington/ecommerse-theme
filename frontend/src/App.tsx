@@ -14,9 +14,9 @@ function App() {
           <Route path="/" element={<Dashboard />} />
         </Route>
         <Route path="product/:id" element={<EachProduct />}></Route>
-        <Route element={<PrefetchProducts />}>
-          <Route path="/orders" element={<Order />}></Route>
-        </Route>
+        {/* <Route element={<PrefetchProducts />}> */}
+        <Route path="/orders" element={<Order />}></Route>
+        {/* </Route> */}
       </Route>
     </Routes>
   );
