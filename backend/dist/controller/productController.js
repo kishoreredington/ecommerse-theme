@@ -31,6 +31,36 @@ export const getAllProducts = async (req, res) => {
         });
     }
 };
+export const getSpecificProduct = async (req, res) => {
+    try {
+        const { id } = req.query;
+        if (!id) {
+            return res.status(400).json({ message: "Product id is required" });
+        }
+        const productRepo = AppDataSource.getRepository(Product);
+        const product = await productRepo.findOne({
+            where: { id: Number(id), isActive: true },
+            relations: {
+                variants: true,
+            },
+        });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        const data = {
+            ...product,
+            productUrl: `${BASE_ASSET_URL}/products/${product.id}/${product.productImage}`,
+        };
+        return res.status(200).json({
+            message: "Product fetched successfully",
+            data,
+        });
+    }
+    catch (error) {
+        console.error("GET SPECIFIC PRODUCT ERROR:", error);
+        return res.status(500).json({ message: "Something went wrong" });
+    }
+};
 export const uploadProduct = async (req, res) => {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
