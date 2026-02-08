@@ -18,9 +18,14 @@ export var OrderStatus;
 (function (OrderStatus) {
     OrderStatus["PENDING"] = "PENDING";
     OrderStatus["PAID"] = "PAID";
+    OrderStatus["CONFIRMED"] = "CONFIRMED";
+    OrderStatus["PROCESSING"] = "PROCESSING";
     OrderStatus["SHIPPED"] = "SHIPPED";
+    OrderStatus["OUT_FOR_DELIVERY"] = "OUT_FOR_DELIVERY";
     OrderStatus["DELIVERED"] = "DELIVERED";
     OrderStatus["CANCELLED"] = "CANCELLED";
+    OrderStatus["RETURNED"] = "RETURNED";
+    OrderStatus["REFUNDED"] = "REFUNDED";
 })(OrderStatus || (OrderStatus = {}));
 let Order = class Order {
     id;

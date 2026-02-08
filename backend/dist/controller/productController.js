@@ -5,11 +5,10 @@ import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
 import fs from "fs";
 import { moveFile } from "../config/Database/multerConfig.js";
 import { Order } from "../config/Database/Schemas/Orders.js";
+const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 export const getAllProducts = async (req, res) => {
     try {
         const productRepo = AppDataSource.getRepository(Product);
-        const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
-        console.log(BASE_ASSET_URL);
         const products = await productRepo.find({
             relations: ["variants"],
         });
@@ -84,7 +83,11 @@ export const getAllUserOrders = async (req, res) => {
         const orders = await orderRepo.find({
             where: { user: { id: 1 } },
             relations: {
-                orderItems: true,
+                orderItems: {
+                    variant: {
+                        product: true,
+                    },
+                },
                 payment: true,
                 address: true,
                 statusHistory: true,
@@ -93,9 +96,23 @@ export const getAllUserOrders = async (req, res) => {
                 createdAt: "DESC",
             },
         });
+        // Transform orders to include productUrl
+        const ordersWithProductUrl = orders.map((order) => ({
+            ...order,
+            orderItems: order.orderItems.map((item) => ({
+                ...item,
+                variant: {
+                    ...item.variant,
+                    product: {
+                        ...item.variant.product,
+                        productUrl: `${process.env.BASE_URL || "http://localhost:3000"}/uploads/products/${item.variant.product.id}/${item.variant.product.productImage}`,
+                    },
+                },
+            })),
+        }));
         return res.status(200).json({
             message: "Orders fetched successfully",
-            data: orders,
+            data: ordersWithProductUrl,
         });
     }
     catch (error) {

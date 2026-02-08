@@ -11,9 +11,14 @@ export type CommonButtonProps = {
 export const OrderStatus = {
   PENDING: "PENDING",
   PAID: "PAID",
+  PROCESSING: "PROCESSING",
   SHIPPED: "SHIPPED",
+  OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
   DELIVERED: "DELIVERED",
   CANCELLED: "CANCELLED",
+  CONFIRMED: "CONFIRMED",
+  RETURNED: "RETURNED",
+  REFUNDED: "REFUNDED",
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];

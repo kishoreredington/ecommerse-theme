@@ -5,11 +5,16 @@ import { Address } from "./Adress.js";
 import { Payment } from "./Payment.js";
 import { OrderItem } from "./Order_Items.js";
 export declare enum OrderStatus {
-    PENDING = "PENDING",
-    PAID = "PAID",
-    SHIPPED = "SHIPPED",
-    DELIVERED = "DELIVERED",
-    CANCELLED = "CANCELLED"
+    PENDING = "PENDING",// Order created, payment pending
+    PAID = "PAID",// Payment successful
+    CONFIRMED = "CONFIRMED",// Order confirmed by admin
+    PROCESSING = "PROCESSING",// Order is being prepared
+    SHIPPED = "SHIPPED",// Order shipped/dispatched
+    OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",// Out for delivery
+    DELIVERED = "DELIVERED",// Successfully delivered
+    CANCELLED = "CANCELLED",// Order cancelled
+    RETURNED = "RETURNED",// Order returned
+    REFUNDED = "REFUNDED"
 }
 export declare class Order {
     id: number;

@@ -1,8 +1,9 @@
-import React from "react";
 import { Download, MoreVertical } from "lucide-react";
 import { useGetAllOrdersQuery } from "../ProductDetails/productApiSlice";
 import { Typography } from "@mui/material";
-
+import ProductItem from "./ProductItem";
+import HorizontalLinearAlternativeLabelStepper from "../../Components/Stepper";
+import { OrderStatus } from "../../type";
 export default function OrderDetails() {
   const { data, isLoading, isError } = useGetAllOrdersQuery(undefined);
 
@@ -21,25 +22,25 @@ export default function OrderDetails() {
     data?.data?.map((order) => ({
       orderNumber: order.id,
       products: order.orderItems.length,
-      customer: "You", // later from profile
+      customer: "You",
       date: new Date(order.createdAt).toLocaleString(),
-
       status: order.status,
-
       deliveryDate: new Date(order.createdAt).toLocaleDateString(),
-
       deliveryAddress: `${order.address.line1}, ${order.address.city}, ${order.address.state}, ${order.address.pincode}, ${order.address.country}`,
-
       total: `USD ${order.totalAmount}`,
+      paymentStatus: order.payment.status,
+      transactionId: order.payment.transactionId,
 
       items: order.orderItems.map((item) => ({
         id: item.id,
-        name: `Product ${item.id}`, // until backend sends real name
+        name: item.variant.product.name,
         quantity: item.quantity,
         price: item.price,
-        color: "N/A",
-        size: "N/A",
-        image: "📦",
+        size: item.variant.size,
+        brand: item.variant.product.brand,
+        productImage: item.variant.product.productImage,
+        productUrl: item.variant.product.productUrl,
+        description: item.variant.product.description,
       })),
     })) || [];
 
@@ -56,7 +57,7 @@ export default function OrderDetails() {
               <Typography variant="h4">
                 Order #: {orderData.orderNumber}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" className="text-gray-500">
                 {orderData.products} Products | By {orderData.customer} |{" "}
                 {orderData.date}
               </Typography>
@@ -65,7 +66,9 @@ export default function OrderDetails() {
             <div className="flex gap-3">
               <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <Download size={18} />
-                <Typography variant="body2">Download invoice</Typography>
+                <Typography variant="body2" className="font-medium">
+                  Download invoice
+                </Typography>
               </button>
 
               <button className="p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -76,9 +79,22 @@ export default function OrderDetails() {
 
           {/* Order Info */}
           <div className="grid grid-cols-2 gap-x-32 gap-y-4 mb-8 pb-8 border-b border-gray-200">
-            <div className="flex gap-3">
-              <Typography variant="body2">Status</Typography>
-              <Typography variant="body2">{orderData.status}</Typography>
+            <div className="flex">
+              <Typography variant="body2" className="text-gray-600 w-40">
+                Status:
+              </Typography>
+              <Typography
+                variant="body2"
+                className={`font-medium ${
+                  orderData.status === "PAID"
+                    ? "text-green-600"
+                    : orderData.status === "On the way"
+                      ? "text-orange-500"
+                      : "text-gray-900"
+                }`}
+              >
+                {orderData.status}
+              </Typography>
             </div>
 
             <div className="flex">
@@ -100,6 +116,15 @@ export default function OrderDetails() {
             </div>
 
             <div className="flex">
+              <Typography variant="body2" className="text-gray-600 w-40">
+                Payment:
+              </Typography>
+              <Typography variant="body2" className="text-gray-900">
+                {orderData.paymentStatus}
+              </Typography>
+            </div>
+
+            <div className="flex">
               <Typography
                 variant="body2"
                 className="text-gray-600 w-40 font-semibold"
@@ -113,39 +138,28 @@ export default function OrderDetails() {
                 {orderData.total}
               </Typography>
             </div>
+
+            <div className="flex">
+              <Typography variant="body2" className="text-gray-600 w-40">
+                Transaction ID:
+              </Typography>
+              <Typography variant="body2" className="text-gray-900 text-xs">
+                {orderData.transactionId}
+              </Typography>
+            </div>
           </div>
 
-          {/* Products */}
+          <div className="mb-4 border-b border-gray-200">
+            <HorizontalLinearAlternativeLabelStepper
+              currentStatus={orderData.status}
+            />
+            
+          </div>
+
+          {/* Products Grid */}
           <div className="grid grid-cols-2 gap-6">
             {orderData.items.map((item) => (
-              <div key={item.id} className="flex gap-4">
-                <div className="w-28 h-28 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Typography variant="h4">{item.image}</Typography>
-                </div>
-
-                <div className="flex-1">
-                  <Typography
-                    variant="subtitle1"
-                    className="font-medium text-gray-900 mb-3"
-                  >
-                    {item.name}
-                  </Typography>
-
-                  <div className="space-y-1">
-                    <Typography variant="body2" className="text-gray-600">
-                      Quantity: {item.quantity}x = USD {item.price}
-                    </Typography>
-
-                    <Typography variant="body2" className="text-gray-600">
-                      Color: {item.color}
-                    </Typography>
-
-                    <Typography variant="body2" className="text-gray-600">
-                      Size: {item.size}
-                    </Typography>
-                  </div>
-                </div>
-              </div>
+              <ProductItem key={item.id} item={item} />
             ))}
           </div>
         </div>

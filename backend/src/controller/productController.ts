@@ -6,12 +6,10 @@ import fs from "fs";
 import { moveFile } from "../config/Database/multerConfig.js";
 import { Order } from "../config/Database/Schemas/Orders.js";
 
+const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const productRepo = AppDataSource.getRepository(Product);
-
-    const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
-    console.log(BASE_ASSET_URL);
 
     const products = await productRepo.find({
       relations: ["variants"],
@@ -36,6 +34,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+export const getSpecificProduct = () => {
+
+}
 
 export const uploadProduct = async (req: Request, res: Response) => {
   const queryRunner = AppDataSource.createQueryRunner();
@@ -89,17 +92,18 @@ export const uploadProduct = async (req: Request, res: Response) => {
 export const getAllUserOrders = async (req: Request, res: Response) => {
   try {
     // const { userId } = req.body;
-
     // if (!userId) {
     //   return res.status(400).json({ message: "No user Id" });
     // }
-
     const orderRepo = AppDataSource.getRepository(Order);
-
     const orders = await orderRepo.find({
       where: { user: { id: 1 } },
       relations: {
-        orderItems: true,
+        orderItems: {
+          variant: {
+            product: true,
+          },
+        },
         payment: true,
         address: true,
         statusHistory: true,
@@ -109,9 +113,24 @@ export const getAllUserOrders = async (req: Request, res: Response) => {
       },
     });
 
+    // Transform orders to include productUrl
+    const ordersWithProductUrl = orders.map((order) => ({
+      ...order,
+      orderItems: order.orderItems.map((item) => ({
+        ...item,
+        variant: {
+          ...item.variant,
+          product: {
+            ...item.variant.product,
+            productUrl: `${process.env.BASE_URL || "http://localhost:3000"}/uploads/products/${item.variant.product.id}/${item.variant.product.productImage}`,
+          },
+        },
+      })),
+    }));
+
     return res.status(200).json({
       message: "Orders fetched successfully",
-      data: orders,
+      data: ordersWithProductUrl,
     });
   } catch (error) {
     console.error("GET USER ORDERS ERROR:", error);
