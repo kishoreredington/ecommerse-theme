@@ -17,7 +17,7 @@ const ProductCard = ({
 }) => {
   const navigate = useNavigate();
   const handleRouteToProduct = (id: string) => {
-    navigate(`/product/${id}`);
+    navigate(`/${id}`);
   };
 
   return (

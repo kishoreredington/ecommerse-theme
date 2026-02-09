@@ -22,3 +22,27 @@ export const OrderStatus = {
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export interface ProductVariant {
+  id: number;
+  size: string;
+  price: string; // keep string if backend returns decimal as string
+  stock: number;
+  isDefault: boolean;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  description: string;
+  productImage: string;
+  isActive: boolean;
+  productUrl: string;
+  variants: ProductVariant[];
+}
+
+export interface GetProductResponse {
+  message: string;
+  data: Product;
+}

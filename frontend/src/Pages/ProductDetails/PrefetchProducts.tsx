@@ -2,18 +2,24 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { productApiSlices } from "./productApiSlice";
 import { store } from "../../app/store";
+import { useParams } from "react-router-dom";
 
-const PrefetchProducts = () => {
+const PrefetchEachProducts = () => {
+  const { id } = useParams();
+
   useEffect(() => {
-    const products = store.dispatch(
-      productApiSlices.endpoints.getAllProducts.initiate({ userId: 1 }),
+    const specificProducts = store.dispatch(
+      productApiSlices.endpoints.getSpecificProduct.initiate({
+        id,
+      }),
     );
 
     return () => {
-      products.unsubscribe();
+      specificProducts.unsubscribe();
     };
   }, []);
+
   return <Outlet />;
 };
 
-export default PrefetchProducts;
+export default PrefetchEachProducts;
