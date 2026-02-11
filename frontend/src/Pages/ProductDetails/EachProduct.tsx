@@ -32,6 +32,8 @@ const EachProduct = () => {
     })(state),
   );
 
+  console.log("CHECKING THE DATA RESULTANT ===========================>", data);
+
   if (isLoading) {
     return <div>Loading</div>;
   }
@@ -43,15 +45,17 @@ const EachProduct = () => {
   console.log(data);
 
   if (isSuccess) {
-    console.log("SUCCESS");
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between">
-          <ProductPriceDetail productDetail={data.data} variant={data.data.variants} />
+          <ProductPriceDetail
+            productDetail={data.data}
+            variant={data.data.variants}
+          />
           <div className="w-120">
-            <img src={SampleProduct}></img>
+            <img src={data.data.productUrl}></img>
           </div>
-          <ProductDescription />
+          <ProductDescription productDetail={data.data} />
         </div>
 
         <div className="flex justify-between items-start">

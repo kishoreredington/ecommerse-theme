@@ -15,4 +15,5 @@ export type Product = {
   isWishlisted: boolean;
   variants: ProductVariant[];
   productUrl: string;
+  isFavourite: boolean;
 };

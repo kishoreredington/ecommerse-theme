@@ -11,6 +11,7 @@ import {
 import { type Relation } from "typeorm";
 
 import { Address } from "./Adress.js";
+import { Favourite } from "./Favourite.js";
 
 @Entity("users")
 export class User {
@@ -31,6 +32,9 @@ export class User {
 
   @OneToMany(() => Address, (address) => address.user)
   addresses!: Relation<Address[]>;
+
+  @OneToMany(() => Favourite, (fav) => fav.user)
+  favourites!: Relation<Favourite[]>;
 
   @BeforeInsert()
   @BeforeUpdate()

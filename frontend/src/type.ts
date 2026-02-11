@@ -36,9 +36,18 @@ export interface Product {
   name: string;
   brand: string;
   description: string;
-  productImage: string;
+  productImage?: string;
   isActive: boolean;
-  productUrl: string;
+
+  about: string;
+  family: string;
+  gender: string;
+  topNotes: string;
+  heartNotes: string;
+  baseNotes: string;
+  longevity: string;
+  sillage: string;
+
   variants: ProductVariant[];
 }
 

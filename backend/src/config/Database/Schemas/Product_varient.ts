@@ -4,10 +4,12 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 
 import { Product } from "./Product.js";
 import { type Relation } from "typeorm";
+import { Favourite } from "./Favourite.js";
 
 @Entity("product_variants")
 export class ProductVariant {
@@ -27,6 +29,9 @@ export class ProductVariant {
     scale: 2,
   })
   price!: number;
+
+  @OneToMany(() => Favourite, (fav) => fav.product)
+  favourites!: Relation<Favourite[]>;
 
   @Column()
   stock!: number;

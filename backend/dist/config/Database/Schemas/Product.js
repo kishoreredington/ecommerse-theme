@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, } from "typeorm";
 import { ProductVariant } from "./Product_varient.js";
 import {} from "typeorm";
+import { Favourite } from "./Favourite.js";
 let Product = class Product {
     id;
     name;
@@ -17,7 +18,16 @@ let Product = class Product {
     description;
     productImage;
     isActive;
+    favourites;
     variants;
+    about;
+    family;
+    gender;
+    topNotes;
+    heartNotes;
+    baseNotes;
+    longevity;
+    sillage;
 };
 __decorate([
     PrimaryGeneratedColumn(),
@@ -44,9 +54,45 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Product.prototype, "isActive", void 0);
 __decorate([
+    OneToMany(() => Favourite, (fav) => fav.product),
+    __metadata("design:type", Object)
+], Product.prototype, "favourites", void 0);
+__decorate([
     OneToMany(() => ProductVariant, (variant) => variant.product),
     __metadata("design:type", Object)
 ], Product.prototype, "variants", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "about", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "family", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "gender", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "topNotes", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "heartNotes", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "baseNotes", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "longevity", void 0);
+__decorate([
+    Column({ default: "" }),
+    __metadata("design:type", String)
+], Product.prototype, "sillage", void 0);
 Product = __decorate([
     Entity("products")
 ], Product);

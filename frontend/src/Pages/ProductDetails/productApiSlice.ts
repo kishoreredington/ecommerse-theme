@@ -7,6 +7,7 @@ export const productApiSlices = apiSlice.injectEndpoints({
         url: "/products/get-all-products",
         method: "GET",
       }),
+      providesTags: ["Products"],
     }),
     getAllOrders: builder.query({
       query: () => ({
@@ -20,6 +21,17 @@ export const productApiSlices = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    setFavourite: builder.mutation({
+      query: ({ userId, productId }) => ({
+        url: `/products/make-favourite`,
+        method: "POST",
+        body: {
+          userId,
+          productId,
+        },
+      }),
+      invalidatesTags: ["Products"],
+    }),
   }),
 });
 
@@ -27,4 +39,5 @@ export const {
   useGetAllProductsQuery,
   useGetAllOrdersQuery,
   useGetSpecificProductQuery,
+  useSetFavouriteMutation,
 } = productApiSlices;

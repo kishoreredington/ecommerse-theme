@@ -2,16 +2,11 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { productApiSlices } from "./productApiSlice";
 import { store } from "../../app/store";
-import { useParams } from "react-router-dom";
 
-const PrefetchEachProducts = () => {
-  const { id } = useParams();
-
+const PrefetchAllProduct = () => {
   useEffect(() => {
     const specificProducts = store.dispatch(
-      productApiSlices.endpoints.getSpecificProduct.initiate({
-        id,
-      }),
+      productApiSlices.endpoints.getAllProducts.initiate(undefined),
     );
 
     return () => {
@@ -22,4 +17,4 @@ const PrefetchEachProducts = () => {
   return <Outlet />;
 };
 
-export default PrefetchEachProducts;
+export default PrefetchAllProduct;

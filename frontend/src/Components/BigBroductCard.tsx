@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const BigProductCard = ({ product }: { product: Product }) => {
   const navigate = useNavigate();
   const handleNavigate = (id: string) => {
-    navigate(`/product/${id}`);
+    navigate(`/${id}`);
   };
   return (
     <div

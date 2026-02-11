@@ -25,6 +25,13 @@ async function seed() {
           "A bold and refreshing fragrance with citrus top notes, a woody heart, and a smooth amber finish.",
         isActive: true,
         productImage: "p1.png",
+        family: "Oriental Woody",
+        gender: "Unisex",
+        topNotes: "Saffron, Bergamot",
+        heartNotes: "Rose, Patchouli",
+        baseNotes: "Oud, Amber, Musk",
+        longevity: "10 - 12 hours",
+        sillage: "Heavy",
       },
       {
         name: "Velvet Rose Oud",
@@ -33,6 +40,13 @@ async function seed() {
           "A luxurious blend of deep rose, smoky oud, and warm spices for an intense evening scent.",
         isActive: true,
         productImage: "p2.png",
+        family: "Oriental Woody",
+        gender: "Unisex",
+        topNotes: "Saffron, Bergamot",
+        heartNotes: "Rose, Patchouli",
+        baseNotes: "Oud, Amber, Musk",
+        longevity: "10 - 12 hours",
+        sillage: "Heavy",
       },
       {
         name: "Aqua Spirit",
@@ -41,6 +55,13 @@ async function seed() {
           "Fresh aquatic notes combined with bergamot and musk, perfect for everyday wear.",
         isActive: true,
         productImage: "p3.png",
+        family: "Floral Oud",
+        gender: "Women",
+        topNotes: "Lychee, Pink Pepper",
+        heartNotes: "Turkish Rose, Peony",
+        baseNotes: "Oud, Vanilla, Sandalwood",
+        longevity: "8 - 10 hours",
+        sillage: "Strong",
       },
       {
         name: "Amber Nights",
@@ -49,6 +70,13 @@ async function seed() {
           "Warm amber, vanilla, and patchouli create a sensual and long-lasting fragrance.",
         isActive: true,
         productImage: "p4.png",
+        family: "Floral Oud",
+        gender: "Women",
+        topNotes: "Lychee, Pink Pepper",
+        heartNotes: "Turkish Rose, Peony",
+        baseNotes: "Oud, Vanilla, Sandalwood",
+        longevity: "8 - 10 hours",
+        sillage: "Strong",
       },
       {
         name: "Citrus Bloom",
@@ -57,6 +85,13 @@ async function seed() {
           "A vibrant burst of lemon, orange blossom, and neroli for a clean and uplifting scent.",
         isActive: true,
         productImage: "p4.png",
+        family: "Fresh Aquatic",
+        gender: "Men",
+        topNotes: "Grapefruit, Lemon",
+        heartNotes: "Marine, Lavender",
+        baseNotes: "Cedarwood, White Musk",
+        longevity: "6 - 8 hours",
+        sillage: "Moderate",
       },
       {
         name: "Midnight Oud",
@@ -65,6 +100,13 @@ async function seed() {
           "Rich oud layered with leather, incense, and dark woods for a powerful nocturnal fragrance.",
         isActive: true,
         productImage: "p5.png",
+        family: "Fresh Aquatic",
+        gender: "Men",
+        topNotes: "Grapefruit, Lemon",
+        heartNotes: "Marine, Lavender",
+        baseNotes: "Cedarwood, White Musk",
+        longevity: "6 - 8 hours",
+        sillage: "Moderate",
       },
       {
         name: "Floral Whisper",
@@ -73,6 +115,13 @@ async function seed() {
           "Soft jasmine and peony blended with white musk for an elegant and delicate aroma.",
         isActive: true,
         productImage: "p6.png",
+        family: "Amber Vanilla",
+        gender: "Unisex",
+        topNotes: "Mandarin, Cinnamon",
+        heartNotes: "Amber, Labdanum",
+        baseNotes: "Vanilla, Tonka Bean",
+        longevity: "9 - 11 hours",
+        sillage: "Moderate to Heavy",
       },
       {
         name: "Spice Route",
@@ -81,6 +130,13 @@ async function seed() {
           "Exotic spices, cardamom, and sandalwood inspired by ancient trade routes.",
         isActive: true,
         productImage: "p1.png",
+        family: "Amber Vanilla",
+        gender: "Unisex",
+        topNotes: "Mandarin, Cinnamon",
+        heartNotes: "Amber, Labdanum",
+        baseNotes: "Vanilla, Tonka Bean",
+        longevity: "9 - 11 hours",
+        sillage: "Moderate to Heavy",
       },
       {
         name: "Vanilla Sky",
@@ -89,6 +145,13 @@ async function seed() {
           "Creamy vanilla and tonka bean wrapped in soft woods for a cozy, comforting scent.",
         isActive: true,
         productImage: "p2.png",
+        family: "Amber Vanilla",
+        gender: "Unisex",
+        topNotes: "Mandarin, Cinnamon",
+        heartNotes: "Amber, Labdanum",
+        baseNotes: "Vanilla, Tonka Bean",
+        longevity: "9 - 11 hours",
+        sillage: "Moderate to Heavy",
       },
       {
         name: "Green Vetiver",
@@ -97,6 +160,13 @@ async function seed() {
           "Earthy vetiver with fresh green notes and citrus accents for a natural, grounding feel.",
         isActive: true,
         productImage: "p3.png",
+        family: "Amber Vanilla",
+        gender: "Unisex",
+        topNotes: "Mandarin, Cinnamon",
+        heartNotes: "Amber, Labdanum",
+        baseNotes: "Vanilla, Tonka Bean",
+        longevity: "9 - 11 hours",
+        sillage: "Moderate to Heavy",
       },
       {
         name: "Solar Musk",
@@ -105,6 +175,13 @@ async function seed() {
           "Radiant musk combined with warm florals and amber, evoking sun-kissed skin.",
         isActive: true,
         productImage: "p4.png",
+        family: "Fresh Aquatic",
+        gender: "Men",
+        topNotes: "Grapefruit, Lemon",
+        heartNotes: "Marine, Lavender",
+        baseNotes: "Cedarwood, White Musk",
+        longevity: "6 - 8 hours",
+        sillage: "Moderate",
       },
     ]);
 
@@ -176,14 +253,18 @@ async function seed() {
         size: "50ml",
         price: 3499.0,
         stock: 40,
-        varientName: "testing",
+        varientName: "Midnight Oud 50ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
       {
         product: savedProducts[0],
         size: "100ml",
         price: 5999.0,
         stock: 25,
-        varientName: "testing",
+        varientName: "Midnight Oud 100ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
 
       // Velvet Rose Oud
@@ -192,14 +273,18 @@ async function seed() {
         size: "50ml",
         price: 4999.0,
         stock: 30,
-        varientName: "testing",
+        varientName: "Velvet Rose Oud 50ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
       {
         product: savedProducts[1],
         size: "100ml",
         price: 8499.0,
         stock: 15,
-        varientName: "testing",
+        varientName: "Velvet Rose Oud 100ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
 
       // Aqua Spirit
@@ -208,14 +293,18 @@ async function seed() {
         size: "50ml",
         price: 2999.0,
         stock: 60,
-        varientName: "testing",
+        varientName: "Aqua Spirit 50ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
       {
         product: savedProducts[2],
         size: "100ml",
         price: 4999.0,
         stock: 35,
-        varientName: "testing",
+        varientName: "Aqua Spirit 100ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
 
       // Amber Nights
@@ -224,14 +313,18 @@ async function seed() {
         size: "50ml",
         price: 4599.0,
         stock: 20,
-        varientName: "testing",
+        varientName: "Amber Nights 50ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
       {
         product: savedProducts[3],
         size: "100ml",
         price: 7899.0,
         stock: 10,
-        varientName: "testing",
+        varientName: "Amber Nights 100ml",
+        about:
+          "At our house of fragrance, we believe perfume is more than an accessory — it is a memory, a mood, and a silent signature that speaks long after you’ve left the room. Every bottle we craft is a balance of artistry and chemistry, designed to evoke emotion, confidence, and timeless elegance.",
       } as any,
     ]);
 

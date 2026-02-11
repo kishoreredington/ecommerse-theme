@@ -7,14 +7,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, } from "typeorm";
 import { Product } from "./Product.js";
 import {} from "typeorm";
+import { Favourite } from "./Favourite.js";
 let ProductVariant = class ProductVariant {
     id;
     product;
     size;
     price;
+    favourites;
     stock;
     isDefault;
 };
@@ -39,6 +41,10 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], ProductVariant.prototype, "price", void 0);
+__decorate([
+    OneToMany(() => Favourite, (fav) => fav.product),
+    __metadata("design:type", Object)
+], ProductVariant.prototype, "favourites", void 0);
 __decorate([
     Column(),
     __metadata("design:type", Number)

@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, BeforeInsert, BeforeUpdate, } from "typeorm";
 import {} from "typeorm";
 import { Address } from "./Adress.js";
+import { Favourite } from "./Favourite.js";
 let User = class User {
     id;
     name;
@@ -18,6 +19,7 @@ let User = class User {
     password;
     createdAt;
     addresses;
+    favourites;
     async hashPassword() {
         if (!this.password.startsWith("$2")) {
             this.password = await bcrypt.hash(this.password, 10);
@@ -48,6 +50,10 @@ __decorate([
     OneToMany(() => Address, (address) => address.user),
     __metadata("design:type", Object)
 ], User.prototype, "addresses", void 0);
+__decorate([
+    OneToMany(() => Favourite, (fav) => fav.user),
+    __metadata("design:type", Object)
+], User.prototype, "favourites", void 0);
 __decorate([
     BeforeInsert(),
     BeforeUpdate(),

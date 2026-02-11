@@ -5,19 +5,37 @@ import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
 import fs from "fs";
 import { moveFile } from "../config/Database/multerConfig.js";
 import { Order } from "../config/Database/Schemas/Orders.js";
+import { Favourite } from "../config/Database/Schemas/Favourite.js";
+import { User } from "../config/Database/Schemas/User.js";
 const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 export const getAllProducts = async (req, res) => {
     try {
+        const userId = Number(req.query.userId) || 1; // later from auth token
         const productRepo = AppDataSource.getRepository(Product);
+        const favRepo = AppDataSource.getRepository(Favourite);
+        // ✅ Fetch products
         const products = await productRepo.find({
             relations: ["variants"],
         });
+        // default: nothing favourited
+        let favProductIds = new Set();
+        // ✅ if user logged in, fetch favourites
+        if (userId) {
+            const favourites = await favRepo.find({
+                where: { user: { id: userId } },
+                relations: ["product"],
+            });
+            favProductIds = new Set(favourites.map((fav) => fav.product.id));
+        }
+        // ✅ attach flag
         const data = products.map((product) => {
             return {
                 ...product,
+                isFavourite: favProductIds.has(product.id),
                 productUrl: `${BASE_ASSET_URL}/products/${product.id}/${product.productImage}`,
             };
         });
+        console.log("users favourite", data);
         return res.status(200).json({
             count: data.length,
             data,
@@ -26,7 +44,6 @@ export const getAllProducts = async (req, res) => {
     catch (error) {
         console.error("Error fetching products:", error);
         return res.status(500).json({
-            success: false,
             message: "Failed to fetch products",
         });
     }
@@ -147,6 +164,53 @@ export const getAllUserOrders = async (req, res) => {
     }
     catch (error) {
         console.error("GET USER ORDERS ERROR:", error);
+        return res.status(500).json({ message: "Something went wrong" });
+    }
+};
+export const makeFavourite = async (req, res) => {
+    try {
+        const { userId, productId } = req.body;
+        const favRepo = AppDataSource.getRepository(Favourite);
+        const userRepo = AppDataSource.getRepository(User);
+        const productRepo = AppDataSource.getRepository(Product);
+        // ✅ check user
+        const user = await userRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        // ✅ check product
+        const product = await productRepo.findOne({ where: { id: productId } });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+        const existingFavourite = await favRepo.findOne({
+            where: {
+                user: { id: userId },
+                product: { id: productId },
+            },
+            relations: ["user", "product"],
+        });
+        // 💔 REMOVE
+        if (existingFavourite) {
+            await favRepo.remove(existingFavourite);
+            return res.status(200).json({
+                message: "Removed from favourites 💔",
+                isFavourite: false,
+            });
+        }
+        // ✅ create
+        const favourite = favRepo.create({
+            user,
+            product,
+        });
+        await favRepo.save(favourite);
+        return res.status(201).json({
+            message: "Added to favourites ❤️",
+            data: favourite,
+        });
+    }
+    catch (error) {
+        console.error(error);
         return res.status(500).json({ message: "Something went wrong" });
     }
 };
