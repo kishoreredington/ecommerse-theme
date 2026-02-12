@@ -12,6 +12,7 @@ import { type Relation } from "typeorm";
 
 import { Address } from "./Adress.js";
 import { Favourite } from "./Favourite.js";
+import { AddToCart } from "./AddToCart.js";
 
 @Entity("users")
 export class User {
@@ -35,6 +36,9 @@ export class User {
 
   @OneToMany(() => Favourite, (fav) => fav.user)
   favourites!: Relation<Favourite[]>;
+
+  @OneToMany(() => AddToCart, (addToCart) => addToCart.user)
+  addToCart!: Relation<AddToCart[]>;
 
   @BeforeInsert()
   @BeforeUpdate()

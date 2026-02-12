@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsc -b && node dist/server.js",
+    "dev": "tsc -b &&  node dist/server.js",
     "seed": "tsc -b && node dist/config/Database/Seed/seed.js",
     "cleardb": "tsc -b && node dist/config/Database/Seed/clear-db.js",
     "start:fresh": "npm run cleardb && npm run seed && npm run dev"

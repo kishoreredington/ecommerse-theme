@@ -10,6 +10,7 @@ import { OrderStatusHistory } from "./Schemas/Order_Status_History.js";
 import { Payment } from "./Schemas/Payment.js";
 import { OrderItem } from "./Schemas/Order_Items.js";
 import { Favourite } from "./Schemas/Favourite.js";
+import { AddToCart } from "./Schemas/AddToCart.js";
 
 dotenv.config(); // ✅ MUST be here (top-level)
 
@@ -32,5 +33,6 @@ export const AppDataSource = new DataSource({
     Payment,
     OrderItem,
     Favourite,
+    AddToCart,
   ],
 });

@@ -10,6 +10,7 @@ import {
 import { Product } from "./Product.js";
 import { type Relation } from "typeorm";
 import { Favourite } from "./Favourite.js";
+import { AddToCart } from "./AddToCart.js";
 
 @Entity("product_variants")
 export class ProductVariant {
@@ -32,6 +33,9 @@ export class ProductVariant {
 
   @OneToMany(() => Favourite, (fav) => fav.product)
   favourites!: Relation<Favourite[]>;
+
+  @OneToMany(() => AddToCart, (addToCart) => addToCart.variant)
+  addToCart!: Relation<AddToCart[]>;
 
   @Column()
   stock!: number;

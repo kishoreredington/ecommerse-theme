@@ -7,6 +7,7 @@ import { moveFile } from "../config/Database/multerConfig.js";
 import { Order } from "../config/Database/Schemas/Orders.js";
 import { Favourite } from "../config/Database/Schemas/Favourite.js";
 import { User } from "../config/Database/Schemas/User.js";
+import { AddToCart } from "../config/Database/Schemas/AddToCart.js";
 
 const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 
@@ -238,6 +239,152 @@ export const makeFavourite = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const addToCart = async (req: Request, res: Response) => {
+  try {
+    const { userId, variantId, quantity } = req.body;
+
+    const cartRepo = AppDataSource.getRepository(AddToCart);
+    const userRepo = AppDataSource.getRepository(User);
+    const variantRepo = AppDataSource.getRepository(ProductVariant);
+
+    // ✅ check user
+    const user = await userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ check variant
+    const variant = await variantRepo.findOne({ where: { id: variantId } });
+    if (!variant) {
+      return res.status(404).json({ message: "Product variant not found" });
+    }
+
+    // ✅ check if already in cart
+    let cartItem = await cartRepo.findOne({
+      where: {
+        user: { id: userId },
+        variant: {
+          id: variantId,
+        },
+      },
+      relations: ["user", "variant"],
+    });
+
+    if (cartItem) {
+      // ✅ update quantity
+      cartItem.quantity += quantity;
+    } else {
+      // ✅ create new cart item
+      cartItem = cartRepo.create({
+        user,
+        variant,
+        quantity,
+      });
+    }
+
+    await cartRepo.save(cartItem);
+
+    return res.status(200).json({
+      message: "Added to cart successfully",
+      data: cartItem,
+    });
+  } catch (error) {
+    console.error("ADD TO CART ERROR:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const removeFromCart = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.body.userId);
+    const variantId = Number(req.body.variantId);
+
+    const cartRepo = AppDataSource.getRepository(AddToCart);
+    const userRepo = AppDataSource.getRepository(User);
+    const variantRepo = AppDataSource.getRepository(ProductVariant);
+
+    // ✅ check user
+    const user = await userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ check variant
+    const variant = await variantRepo.findOne({ where: { id: variantId } });
+    if (!variant) {
+      return res.status(404).json({ message: "Product variant not found" });
+    }
+
+    const all = await cartRepo.find({
+      relations: ["user", "variant"],
+    });
+    console.log("ALL CART ITEMS:", all);
+
+    // ✅ find cart item
+    const cartItem = await cartRepo.findOne({
+      where: {
+        user: {
+          id: userId,
+        },
+        variant: {
+          id: variantId,
+        },
+      },
+    });
+
+    console.log("CART ITEM TO REMOVE:", cartItem);
+
+    if (!cartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    await cartRepo.remove(cartItem);
+
+    return res.status(200).json({
+      message: "Removed from cart successfully",
+    });
+  } catch (error) {
+    console.error("REMOVE FROM CART ERROR:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getAddToCart = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  const addToCartRepo = AppDataSource.getRepository(AddToCart);
+
+  try {
+    const cartItems = await addToCartRepo.find({
+      where: { user: { id: 1 } },
+      relations: {
+        variant: {
+          product: true,
+        },
+      },
+    });
+
+    const data = cartItems.map((item) => ({
+      ...item,
+      variant: {
+        ...item.variant,
+        product: {
+          ...item.variant.product,
+          productUrl: `${BASE_ASSET_URL}/products/${item.variant.product.id}/${item.variant.product.productImage}`,
+        },
+      },
+    }));
+
+    return res.status(200).json({
+      message: "Cart items fetched successfully",
+      data,
+    });
+  } catch (error) {
+    console.error("GET CART ITEMS ERROR:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

@@ -12,6 +12,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, Be
 import {} from "typeorm";
 import { Address } from "./Adress.js";
 import { Favourite } from "./Favourite.js";
+import { AddToCart } from "./AddToCart.js";
 let User = class User {
     id;
     name;
@@ -20,6 +21,7 @@ let User = class User {
     createdAt;
     addresses;
     favourites;
+    addToCart;
     async hashPassword() {
         if (!this.password.startsWith("$2")) {
             this.password = await bcrypt.hash(this.password, 10);
@@ -54,6 +56,10 @@ __decorate([
     OneToMany(() => Favourite, (fav) => fav.user),
     __metadata("design:type", Object)
 ], User.prototype, "favourites", void 0);
+__decorate([
+    OneToMany(() => AddToCart, (addToCart) => addToCart.user),
+    __metadata("design:type", Object)
+], User.prototype, "addToCart", void 0);
 __decorate([
     BeforeInsert(),
     BeforeUpdate(),

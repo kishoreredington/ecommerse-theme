@@ -17,7 +17,9 @@ async function clearDatabase() {
         product_variants,
         addresses,
         products,
-        users
+        favourites,
+        users,
+        add_to_cart
       RESTART IDENTITY CASCADE;
     `);
 

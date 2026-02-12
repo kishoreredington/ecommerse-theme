@@ -11,12 +11,14 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMan
 import { Product } from "./Product.js";
 import {} from "typeorm";
 import { Favourite } from "./Favourite.js";
+import { AddToCart } from "./AddToCart.js";
 let ProductVariant = class ProductVariant {
     id;
     product;
     size;
     price;
     favourites;
+    addToCart;
     stock;
     isDefault;
 };
@@ -45,6 +47,10 @@ __decorate([
     OneToMany(() => Favourite, (fav) => fav.product),
     __metadata("design:type", Object)
 ], ProductVariant.prototype, "favourites", void 0);
+__decorate([
+    OneToMany(() => AddToCart, (addToCart) => addToCart.variant),
+    __metadata("design:type", Object)
+], ProductVariant.prototype, "addToCart", void 0);
 __decorate([
     Column(),
     __metadata("design:type", Number)
