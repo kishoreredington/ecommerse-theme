@@ -32,8 +32,6 @@ const EachProduct = () => {
     })(state),
   );
 
-  console.log("CHECKING THE DATA RESULTANT ===========================>", data);
-
   if (isLoading) {
     return <div>Loading</div>;
   }

@@ -4,6 +4,8 @@ import CommonButton from "../../Components/CustomButton";
 import { useRazorpayBuy } from "../../app/hooks/useRazerpayBuy";
 import type { ProductVariant, Product } from "../../type";
 import { useState } from "react";
+import { useAddToCartMutation } from "./productApiSlice";
+import { Counter } from "../../Components/Counter";
 
 const ProductPriceDetail = ({
   variant,
@@ -12,11 +14,30 @@ const ProductPriceDetail = ({
   variant?: ProductVariant[] | undefined;
   productDetail: Product;
 }) => {
-  console.log(variant);
   const { handleBuy, isLoading } = useRazorpayBuy();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
     variant[0],
   );
+
+  const [quantity, setQuantity] = useState(1);
+
+  const [addToCart] = useAddToCartMutation();
+
+  const handleAddToCart = () => {
+    if (quantity <= 0) {
+      console.log("Please select atleast one quantity to order.");
+      return;
+    }
+    try {
+      addToCart({
+        userId: 1,
+        variantId: selectedVariant.id,
+        quantity,
+      }).unwrap();
+    } catch (error) {
+      console.log("Error adding to cart:", error);
+    }
+  };
 
   return (
     <div className="flex-2 p-4 ">
@@ -48,8 +69,8 @@ const ProductPriceDetail = ({
         <Typography>More about delivery →</Typography>
       </div> */}
       {/* Actions */}
-      <div className="mt-6 flex gap-3">
-        <CommonButton
+      <div className="mt-6 flex gap-5">
+        {/* <CommonButton
           onClick={() =>
             handleBuy({
               amount: 500,
@@ -58,8 +79,11 @@ const ProductPriceDetail = ({
           className="w-[90%]"
         >
           Buy
+        </CommonButton> */}
+        <Counter count={quantity} onChange={setQuantity} min={1} />
+        <CommonButton onClick={handleAddToCart} className="w-[90%]">
+          Add to cart
         </CommonButton>
-        <CommonButton className="w-[90%]">Add to cart</CommonButton>
         <CommonButton variant="secondary">
           <Heart color="black" />
         </CommonButton>

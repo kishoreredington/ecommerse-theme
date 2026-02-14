@@ -32,6 +32,23 @@ export const productApiSlices = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Products"],
     }),
+    getAllCart: builder.query({
+      query: ({ userId }) => ({
+        url: `/products/get-all-cart?userId=${userId}`,
+        method: "GET",
+      }),
+    }),
+    addToCart: builder.mutation({
+      query: ({ userId, variantId, quantity }) => ({
+        url: `/products/add-to-cart`,
+        method: "POST",
+        body: {
+          userId,
+          variantId,
+          quantity,
+        },
+      }),
+    }),
   }),
 });
 
@@ -40,4 +57,5 @@ export const {
   useGetAllOrdersQuery,
   useGetSpecificProductQuery,
   useSetFavouriteMutation,
+  useAddToCartMutation,
 } = productApiSlices;

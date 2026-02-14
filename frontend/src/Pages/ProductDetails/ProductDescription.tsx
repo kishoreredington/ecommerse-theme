@@ -1,5 +1,4 @@
 import { Typography } from "@mui/material";
-import CommonButton from "../../Components/CustomButton";
 import { type Product } from "../../type";
 
 export default function ProductDescription({

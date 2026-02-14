@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Menu, User, Search, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { User, Search } from "lucide-react";
 import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../app/hooks/stateHook";
+import { productApiSlices } from "../Pages/ProductDetails/productApiSlice";
 
 const Header = () => {
   const [catalogOpen, setCatalogOpen] = useState(false);
@@ -11,11 +13,20 @@ const Header = () => {
     navigate(`/${link}`);
   };
 
+  const {
+    data: cartProducts,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useAppSelector((state) =>
+    productApiSlices.endpoints.getAllCart.select({ userId: 1 })(state),
+  );
+
   return (
     <header className="bg-white border-b border-gray-200 border-b-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left Section - Navigation */}
           <div className="flex items-center space-x-8">
             <div className="relative">
               <button
@@ -49,7 +60,6 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Right Section - Actions */}
           <div className="flex items-center space-x-6">
             <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
               <User className="w-5 h-5" />
@@ -59,9 +69,12 @@ const Header = () => {
               <Search className="w-5 h-5" />
               <Typography>SEARCH</Typography>
             </button>
-            <button className="bg-black gap-3 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center space-x-2">
+            <button
+              onClick={() => handleNavigate("cart-products")}
+              className="bg-black gap-3 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center space-x-2"
+            >
               <Typography>CART</Typography>
-              <Typography>2</Typography>
+              <Typography>{cartProducts?.data?.length ?? 0}</Typography>
             </button>
 
             <button
