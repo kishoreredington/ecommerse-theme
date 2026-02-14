@@ -44,6 +44,16 @@ export default function OrderDetails() {
       })),
     })) || [];
 
+  if (formattedOrders.length === 0) {
+    return (
+      <div className=" flex  items-center justify-center">
+        <Typography className="text-center " variant="h4">
+          You have no orders yet. Start shopping to see your orders here!
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-gray-50 mt-3">
       {formattedOrders.map((orderData) => (
@@ -153,7 +163,6 @@ export default function OrderDetails() {
             <HorizontalLinearAlternativeLabelStepper
               currentStatus={orderData.status}
             />
-            
           </div>
 
           {/* Products Grid */}

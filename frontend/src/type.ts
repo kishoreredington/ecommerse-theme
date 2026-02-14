@@ -55,3 +55,18 @@ export interface GetProductResponse {
   message: string;
   data: Product;
 }
+
+export interface CartProductVariant extends ProductVariant {
+  product: Product;
+}
+
+export interface CartItem {
+  id: number;
+  variant: CartProductVariant;
+  quantity: number;
+}
+
+export interface GetCartResponse {
+  message: string;
+  data: CartItem[];
+}

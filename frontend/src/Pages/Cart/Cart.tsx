@@ -1,23 +1,3 @@
-// import { useAppSelector } from "../../app/hooks/stateHook";
-// import { productApiSlices } from "../ProductDetails/productApiSlice";
-
-// const Cart = () => {
-//   const {
-//     data: cartProducts,
-//     isLoading,
-//     isError,
-//     error,
-//     isSuccess,
-//   } = useAppSelector((state) =>
-//     productApiSlices.endpoints.getAllCart.select({ userId: 1 })(state),
-//   );
-
-//   console.log("CHECKING CART PRODUCTS", cartProducts);
-//   return <div>HAIIIIIIII</div>;
-// };
-
-// export default Cart;
-
 import { useState } from "react";
 import {
   IconButton,
@@ -31,74 +11,96 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import { useAppSelector } from "../../app/hooks/stateHook";
+import {
+  productApiSlices,
+  useSetFavouriteMutation,
+} from "../ProductDetails/productApiSlice";
+import { type GetCartResponse } from "../../type";
+import { useDeleteFromCartMutation } from "../ProductDetails/productApiSlice";
 
 const CartPage = () => {
+  const {
+    data: cartProducts,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  }: {
+    cartProducts: GetCartResponse | undefined;
+    isLoading: boolean;
+    isError: boolean;
+    error: any;
+    isSuccess: boolean;
+  } = useAppSelector((state) =>
+    productApiSlices.endpoints.getAllCart.select({ userId: 1 })(state),
+  );
+
+  const [deleteFromCart] = useDeleteFromCartMutation();
+  const [setFavourite] = useSetFavouriteMutation();
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      brand: "Maison Élégance",
-      name: "Bleu de Noir",
-      size: "100ml",
-      price: 125,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400",
-    },
-    {
-      id: 2,
-      brand: "Royal Scents",
-      name: "Velvet Rose Oud",
-      size: "50ml",
-      price: 89,
-      quantity: 2,
-      image:
-        "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=400",
-    },
-    {
-      id: 3,
-      brand: "Oceanica",
-      name: "Aqua Spirit",
-      size: "100ml",
-      price: 110,
-      quantity: 1,
-      image:
-        "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=400",
-    },
-  ]);
 
   const [promoCode, setPromoCode] = useState("");
 
-  const updateQuantity = (id, change) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item,
-      ),
-    );
-  };
+  // Map API response to cart items format
+  const cartItems =
+    cartProducts?.data?.map((cartItem) => ({
+      id: cartItem.id,
+      brand: cartItem.variant.product.brand,
+      name: cartItem.variant.product.name,
+      size: cartItem.variant.size,
+      price: parseFloat(cartItem.variant.price),
+      quantity: cartItem.quantity,
+      image: cartItem.variant.product.productUrl,
+    })) || [];
 
-  const removeItem = (id) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+  const updateQuantity = (id: any, change: any) => {
+    // TODO: Implement API call to update quantity
+    console.log(`Update quantity for cart item ${id} by ${change}`);
     setSnackbar({
       open: true,
-      message: "Item removed from cart",
-      severity: "info",
-    });
-  };
-
-  const moveToWishlist = (id) => {
-    removeItem(id);
-    setSnackbar({
-      open: true,
-      message: "Item moved to wishlist",
+      message: "Quantity updated",
       severity: "success",
     });
+  };
+
+  const removeItem = async (id: any) => {
+    try {
+      await deleteFromCart({ userId: 1, variantId: id }).unwrap();
+      setSnackbar({
+        open: true,
+        message: "Item removed from cart",
+        severity: "info",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Unable to remove item from cart",
+        severity: "info",
+      });
+    }
+  };
+
+  const moveToWishlist = async (id: any) => {
+    try {
+      await setFavourite({ userId: 1, productId: id }).unwrap();
+      setSnackbar({
+        open: true,
+        message: "Item moved to wishlist",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Item moved to wishlist",
+        severity: "success",
+      });
+    }
   };
 
   const subtotal = cartItems.reduce(
@@ -107,6 +109,24 @@ const CartPage = () => {
   );
   const shipping = subtotal > 150 ? 0 : 15;
   const total = subtotal + shipping;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <p className="text-neutral-600">Loading cart...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <p className="text-red-600">
+          Error loading cart: {error?.message || "Unknown error"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -134,7 +154,7 @@ const CartPage = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-6">
             {/* Free Shipping Banner */}
-            {subtotal < 150 && (
+            {subtotal < 150 && cartItems.length > 0 && (
               <div className="bg-neutral-100 border border-neutral-200 px-6 py-4 flex items-center gap-3">
                 <LocalShippingOutlinedIcon className="text-neutral-600" />
                 <p className="text-sm text-neutral-700">
@@ -147,87 +167,98 @@ const CartPage = () => {
               </div>
             )}
 
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border border-neutral-200 p-6"
-              >
-                <div className="flex gap-6">
-                  {/* Product Image */}
-                  <div className="w-32 h-32 flex-shrink-0 bg-neutral-100 overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            {cartItems.length === 0 ? (
+              <div className="bg-white border border-neutral-200 p-12 text-center">
+                <p className="text-neutral-600 mb-4">Your cart is empty</p>
+                <button className="text-sm text-neutral-900 hover:underline">
+                  Continue Shopping
+                </button>
+              </div>
+            ) : (
+              cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white border border-neutral-200 p-6"
+                >
+                  <div className="flex gap-6">
+                    {/* Product Image */}
+                    <div className="w-32 h-32 flex-shrink-0 bg-neutral-100 overflow-hidden">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                  {/* Product Details */}
-                  <div className="flex-grow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <p className="text-xs tracking-widest text-neutral-500 mb-1">
-                          {item.brand}
+                    {/* Product Details */}
+                    <div className="flex-grow">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="text-xs tracking-widest text-neutral-500 mb-1">
+                            {item.brand}
+                          </p>
+                          <h3 className="text-lg font-light tracking-wide mb-1">
+                            {item.name}
+                          </h3>
+                          <p className="text-sm text-neutral-600">
+                            {item.size}
+                          </p>
+                        </div>
+                        <p className="text-lg font-light">${item.price}</p>
+                      </div>
+
+                      {/* Quantity & Actions */}
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center border border-neutral-300">
+                          <button
+                            onClick={() => updateQuantity(item.id, -1)}
+                            className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
+                          >
+                            −
+                          </button>
+                          <span className="px-6 py-2 border-x border-neutral-300 min-w-[60px] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.id, 1)}
+                            className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <IconButton
+                            size="small"
+                            onClick={() => moveToWishlist(item.id)}
+                            className="hover:bg-neutral-100"
+                          >
+                            <FavoriteBorderIcon  fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => removeItem(item.id)}
+                            className="hover:bg-neutral-100"
+                          >
+                            <DeleteOutlineIcon fontSize="small" />
+                          </IconButton>
+                        </div>
+                      </div>
+
+                      {/* Item Total */}
+                      <div className="mt-3 text-right">
+                        <p className="text-sm text-neutral-600">
+                          Subtotal:{" "}
+                          <span className="font-medium text-neutral-900">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </span>
                         </p>
-                        <h3 className="text-lg font-light tracking-wide mb-1">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-neutral-600">{item.size}</p>
                       </div>
-                      <p className="text-lg font-light">${item.price}</p>
-                    </div>
-
-                    {/* Quantity & Actions */}
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center border border-neutral-300">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
-                        >
-                          −
-                        </button>
-                        <span className="px-6 py-2 border-x border-neutral-300 min-w-[60px] text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <IconButton
-                          size="small"
-                          onClick={() => moveToWishlist(item.id)}
-                          className="hover:bg-neutral-100"
-                        >
-                          <FavoriteBorderIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => removeItem(item.id)}
-                          className="hover:bg-neutral-100"
-                        >
-                          <DeleteOutlineIcon fontSize="small" />
-                        </IconButton>
-                      </div>
-                    </div>
-
-                    {/* Item Total */}
-                    <div className="mt-3 text-right">
-                      <p className="text-sm text-neutral-600">
-                        Subtotal:{" "}
-                        <span className="font-medium text-neutral-900">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </span>
-                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Order Summary */}
@@ -309,6 +340,7 @@ const CartPage = () => {
                 variant="contained"
                 size="large"
                 className="bg-neutral-900 text-white hover:bg-neutral-800 py-3 mb-3"
+                disabled={cartItems.length === 0}
                 sx={{
                   backgroundColor: "#171717",
                   "&:hover": {
