@@ -10,7 +10,7 @@ declare global {
 }
 
 type BuyOptions = {
-  amount: number;
+  amount?: number;
   name?: string;
   description?: string;
   prefill?: {
@@ -18,6 +18,11 @@ type BuyOptions = {
     email?: string;
     contact?: string;
   };
+  addressId?: number;
+  items: {
+    variantId: number;
+    quantity: number;
+  }[];
 };
 
 export const useRazorpayBuy = () => {
@@ -26,27 +31,16 @@ export const useRazorpayBuy = () => {
     useVerifyOrderMutation();
 
   const handleBuy = async ({
-    amount,
     name = "Alphery",
-    description = "Purchase",
     prefill,
+    addressId,
+    items,
   }: BuyOptions) => {
     try {
       const { strapiOrder, orderId } = await createOrder({
-        addressId: 1,
-        items: [
-          {
-            variantId: 1,
-            quantity: 2,
-          },
-          {
-            variantId: 2,
-            quantity: 5,
-          },
-        ],
+        addressId: addressId,
+        items,
       }).unwrap();
-
-      console.log("CHECKING STRAPI ORDERS", strapiOrder);
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY,

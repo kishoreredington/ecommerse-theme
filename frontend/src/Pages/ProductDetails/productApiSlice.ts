@@ -52,10 +52,10 @@ export const productApiSlices = apiSlice.injectEndpoints({
       invalidatesTags: ["Cart"],
     }),
     deleteFromCart: builder.mutation({
-      query: ({ userId, variantId }) => ({
+      query: ({ cartId }) => ({
         url: `/products/remove-from-cart`,
         method: "DELETE",
-        body: { userId, variantId },
+        body: { cartId },
       }),
       invalidatesTags: ["Cart"],
     }),

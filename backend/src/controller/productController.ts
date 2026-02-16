@@ -8,6 +8,7 @@ import { Order } from "../config/Database/Schemas/Orders.js";
 import { Favourite } from "../config/Database/Schemas/Favourite.js";
 import { User } from "../config/Database/Schemas/User.js";
 import { AddToCart } from "../config/Database/Schemas/AddToCart.js";
+import { kMaxLength } from "buffer";
 
 const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 
@@ -18,15 +19,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
     const productRepo = AppDataSource.getRepository(Product);
     const favRepo = AppDataSource.getRepository(Favourite);
 
-    // ✅ Fetch products
     const products = await productRepo.find({
       relations: ["variants"],
     });
 
-    // default: nothing favourited
     let favProductIds = new Set<number>();
 
-    // ✅ if user logged in, fetch favourites
     if (userId) {
       const favourites = await favRepo.find({
         where: { user: { id: userId } },
@@ -36,7 +34,6 @@ export const getAllProducts = async (req: Request, res: Response) => {
       favProductIds = new Set(favourites.map((fav) => fav.product.id));
     }
 
-    // ✅ attach flag
     const data = products.map((product) => {
       return {
         ...product,
@@ -45,14 +42,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
       };
     });
 
-    console.log("users favourite", data);
-
     return res.status(200).json({
       count: data.length,
       data,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
     return res.status(500).json({
       message: "Failed to fetch products",
     });
@@ -300,43 +294,15 @@ export const addToCart = async (req: Request, res: Response) => {
 
 export const removeFromCart = async (req: Request, res: Response) => {
   try {
-    const userId = Number(req.body.userId);
-    const variantId = Number(req.body.variantId);
+    const cartId = Number(req.body.cartId);
+
+    console.log("REMOVE FROM CART - cartId:", cartId);
 
     const cartRepo = AppDataSource.getRepository(AddToCart);
-    const userRepo = AppDataSource.getRepository(User);
-    const variantRepo = AppDataSource.getRepository(ProductVariant);
 
-    // ✅ check user
-    const user = await userRepo.findOne({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // ✅ check variant
-    const variant = await variantRepo.findOne({ where: { id: variantId } });
-    if (!variant) {
-      return res.status(404).json({ message: "Product variant not found" });
-    }
-
-    const all = await cartRepo.find({
-      relations: ["user", "variant"],
-    });
-    console.log("ALL CART ITEMS:", all);
-
-    // ✅ find cart item
     const cartItem = await cartRepo.findOne({
-      where: {
-        user: {
-          id: userId,
-        },
-        variant: {
-          id: variantId,
-        },
-      },
+      where: { id: cartId },
     });
-
-    console.log("CART ITEM TO REMOVE:", cartItem);
 
     if (!cartItem) {
       return res.status(404).json({ message: "Cart item not found" });

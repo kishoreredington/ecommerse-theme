@@ -23,6 +23,29 @@ const theme = createTheme({
       },
     },
 
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: "0px",
+          fontSize: "14px",
+          fontWeight: 500,
+          color: "white",
+        },
+        filledSuccess: {
+          backgroundColor: "#000000ff",
+        },
+        filledError: {
+          backgroundColor: "#d32f2f",
+        },
+        filledWarning: {
+          backgroundColor: "#ed6c02",
+        },
+        filledInfo: {
+          backgroundColor: "#000000ff",
+        },
+      },
+    },
+
     MuiButton: {
       variants: [
         {

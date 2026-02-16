@@ -6,6 +6,7 @@ import type { ProductVariant, Product } from "../../type";
 import { useState } from "react";
 import { useAddToCartMutation } from "./productApiSlice";
 import { Counter } from "../../Components/Counter";
+import { Snackbar, Alert } from "@mui/material";
 
 const ProductPriceDetail = ({
   variant,
@@ -18,6 +19,12 @@ const ProductPriceDetail = ({
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
     variant[0],
   );
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const [quantity, setQuantity] = useState(1);
 
@@ -34,6 +41,12 @@ const ProductPriceDetail = ({
         variantId: selectedVariant.id,
         quantity,
       }).unwrap();
+
+      setSnackbar({
+        open: true,
+        message: "Item added to cart successfully!",
+        severity: "info",
+      });
     } catch (error) {
       console.log("Error adding to cart:", error);
     }
@@ -56,19 +69,6 @@ const ProductPriceDetail = ({
         })}
       </div>
       <Typography variant="h4">INR {selectedVariant.price}</Typography>
-      {/* <div className="mt-6 space-y-2 text-sm">
-        <div className="flex justify-between">
-          <Typography>pick-up point</Typography>
-          <Typography>12 Feb</Typography>
-        </div>
-        <div className="flex justify-between">
-          <Typography>courier delivery</Typography>
-          <Typography>tomorrow</Typography>
-        </div>
-
-        <Typography>More about delivery →</Typography>
-      </div> */}
-      {/* Actions */}
       <div className="mt-6 flex gap-5">
         {/* <CommonButton
           onClick={() =>
@@ -88,6 +88,20 @@ const ProductPriceDetail = ({
           <Heart color="black" />
         </CommonButton>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

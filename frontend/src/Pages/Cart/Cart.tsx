@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import {
   IconButton,
-  Button,
   TextField,
   Divider,
   Snackbar,
   Alert,
+  Typography,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import { useAppSelector } from "../../app/hooks/stateHook";
@@ -18,6 +18,9 @@ import {
 } from "../ProductDetails/productApiSlice";
 import { type GetCartResponse } from "../../type";
 import { useDeleteFromCartMutation } from "../ProductDetails/productApiSlice";
+import CommonButton from "../../Components/CustomButton";
+import { useNavigate } from "react-router-dom";
+import { useRazorpayBuy } from "../../app/hooks/useRazerpayBuy";
 
 const CartPage = () => {
   const {
@@ -35,6 +38,10 @@ const CartPage = () => {
   } = useAppSelector((state) =>
     productApiSlices.endpoints.getAllCart.select({ userId: 1 })(state),
   );
+
+  const { handleBuy, isLoading: isPaymentLoading } = useRazorpayBuy();
+
+  const navigate = useNavigate();
 
   const [deleteFromCart] = useDeleteFromCartMutation();
   const [setFavourite] = useSetFavouriteMutation();
@@ -57,6 +64,7 @@ const CartPage = () => {
       price: parseFloat(cartItem.variant.price),
       quantity: cartItem.quantity,
       image: cartItem.variant.product.productUrl,
+      variantId: cartItem.variant.id,
     })) || [];
 
   const updateQuantity = (id: any, change: any) => {
@@ -69,9 +77,9 @@ const CartPage = () => {
     });
   };
 
-  const removeItem = async (id: any) => {
+  const removeItem = async (cartId: any) => {
     try {
-      await deleteFromCart({ userId: 1, variantId: id }).unwrap();
+      await deleteFromCart({ cartId }).unwrap();
       setSnackbar({
         open: true,
         message: "Item removed from cart",
@@ -129,20 +137,19 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="bg-neutral-50">
       {/* Header */}
       <header className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="mx-auto py-4">
           <div className="flex items-center justify-between">
-            <button className="flex items-center gap-2 text-neutral-700 hover:text-black transition-colors">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-neutral-700 hover:text-black transition-colors cursor-pointer"
+            >
               <ArrowBackIcon />
-              <span className="text-sm font-light tracking-wide">
-                CONTINUE SHOPPING
-              </span>
+              <Typography>CONTINUE SHOPPING</Typography>
             </button>
-            <h1 className="text-3xl font-light tracking-widest">
-              CART ({cartItems.length})
-            </h1>
+            <Typography>CART ({cartItems.length})</Typography>
             <div className="w-40"></div>
           </div>
         </div>
@@ -167,12 +174,12 @@ const CartPage = () => {
               </div>
             )}
 
+            {console.log(cartItems)}
+
             {cartItems.length === 0 ? (
               <div className="bg-white border border-neutral-200 p-12 text-center">
-                <p className="text-neutral-600 mb-4">Your cart is empty</p>
-                <button className="text-sm text-neutral-900 hover:underline">
-                  Continue Shopping
-                </button>
+                <Typography variant="body1">Your cart is empty</Typography>
+                <Typography variant="h4">Continue Shopping</Typography>
               </div>
             ) : (
               cartItems.map((item) => (
@@ -194,47 +201,31 @@ const CartPage = () => {
                     <div className="flex-grow">
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <p className="text-xs tracking-widest text-neutral-500 mb-1">
+                          <Typography className="text-xs tracking-widest text-neutral-500 mb-1">
                             {item.brand}
-                          </p>
-                          <h3 className="text-lg font-light tracking-wide mb-1">
+                          </Typography>
+                          <Typography
+                            variant="h5"
+                            className="text-lg font-light tracking-wide mb-1"
+                          >
                             {item.name}
-                          </h3>
-                          <p className="text-sm text-neutral-600">
+                          </Typography>
+                          <Typography className="text-sm text-neutral-600">
                             {item.size}
-                          </p>
+                          </Typography>
                         </div>
-                        <p className="text-lg font-light">${item.price}</p>
+                        <Typography variant="h4" className="text-lg font-light">
+                          $ {item.price}
+                        </Typography>
                       </div>
 
                       {/* Quantity & Actions */}
                       <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center border border-neutral-300">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
-                          >
-                            −
-                          </button>
-                          <span className="px-6 py-2 border-x border-neutral-300 min-w-[60px] text-center">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="px-4 py-2 hover:bg-neutral-100 transition-colors text-neutral-700"
-                          >
-                            +
-                          </button>
-                        </div>
+                        <Typography variant="h5">
+                          Quantity: {item.quantity}
+                        </Typography>
 
                         <div className="flex gap-2">
-                          <IconButton
-                            size="small"
-                            onClick={() => moveToWishlist(item.id)}
-                            className="hover:bg-neutral-100"
-                          >
-                            <FavoriteBorderIcon  fontSize="small" />
-                          </IconButton>
                           <IconButton
                             size="small"
                             onClick={() => removeItem(item.id)}
@@ -246,13 +237,30 @@ const CartPage = () => {
                       </div>
 
                       {/* Item Total */}
-                      <div className="mt-3 text-right">
-                        <p className="text-sm text-neutral-600">
-                          Subtotal:{" "}
+                      <div className="mt-3 text-right flex ">
+                        <CommonButton
+                          onClick={() =>
+                            handleBuy({
+                              amount: total,
+                              addressId: 1,
+                              items: [
+                                {
+                                  variantId: item.variantId,
+                                  quantity: item.quantity,
+                                },
+                              ],
+                            })
+                          }
+                          disabled={cartItems.length === 0}
+                        >
+                          PROCEED FOT SINGLE ITEM
+                        </CommonButton>
+                        <Typography className="text-sm text-neutral-600">
+                          Subtotal:{"   "}
                           <span className="font-medium text-neutral-900">
                             ${(item.price * item.quantity).toFixed(2)}
                           </span>
-                        </p>
+                        </Typography>
                       </div>
                     </div>
                   </div>
@@ -264,15 +272,11 @@ const CartPage = () => {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white border border-neutral-200 p-6 sticky top-6">
-              <h2 className="text-xl font-light tracking-widest mb-6">
-                ORDER SUMMARY
-              </h2>
+              <Typography variant="h5">ORDER SUMMARY</Typography>
 
               {/* Promo Code */}
               <div className="mb-6">
-                <label className="text-xs tracking-widest text-neutral-600 mb-2 block">
-                  PROMO CODE
-                </label>
+                <Typography variant="body2">PROMO CODE</Typography>
                 <div className="flex gap-2">
                   <TextField
                     size="small"
@@ -287,7 +291,15 @@ const CartPage = () => {
                       },
                     }}
                   />
-                  <Button
+                  <CommonButton
+                    disabled={true}
+                    onClick={() => {
+                      setSnackbar({
+                        open: true,
+                        message: "Item moved to wishlist",
+                        severity: "success",
+                      });
+                    }}
                     variant="outlined"
                     className="border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white transition-colors"
                     sx={{
@@ -304,7 +316,7 @@ const CartPage = () => {
                     }}
                   >
                     Apply
-                  </Button>
+                  </CommonButton>
                 </div>
               </div>
 
@@ -313,48 +325,43 @@ const CartPage = () => {
               {/* Price Breakdown */}
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600">Subtotal</span>
-                  <span className="text-neutral-900">
+                  <Typography>Subtotal</Typography>
+                  <Typography className="text-neutral-900">
                     ${subtotal.toFixed(2)}
-                  </span>
+                  </Typography>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600">Shipping</span>
-                  <span className="text-neutral-900">
+                  <Typography className="text-neutral-600">Shipping</Typography>
+                  <Typography className="text-neutral-900">
                     {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
-                  </span>
+                  </Typography>
                 </div>
               </div>
 
               <Divider className="my-4" />
 
-              {/* Total */}
               <div className="flex justify-between items-baseline mb-6">
-                <span className="text-lg tracking-wide">Total</span>
-                <span className="text-2xl font-light">${total.toFixed(2)}</span>
+                <Typography className="text-lg tracking-wide">Total</Typography>
+                <Typography className="text-2xl font-light">
+                  ${total.toFixed(2)}
+                </Typography>
               </div>
 
-              {/* Checkout Button */}
-              <Button
-                fullWidth
-                variant="contained"
-                size="large"
-                className="bg-neutral-900 text-white hover:bg-neutral-800 py-3 mb-3"
+              <CommonButton
+                onClick={() =>
+                  handleBuy({
+                    amount: total,
+                    addressId: 1,
+                    items: cartProducts.data.map((item: any) => ({
+                      variantId: item.variant?.id,
+                      quantity: item.quantity,
+                    })),
+                  })
+                }
                 disabled={cartItems.length === 0}
-                sx={{
-                  backgroundColor: "#171717",
-                  "&:hover": {
-                    backgroundColor: "#262626",
-                  },
-                  textTransform: "none",
-                  fontSize: "0.875rem",
-                  fontWeight: 300,
-                  letterSpacing: "0.1em",
-                  padding: "12px",
-                }}
               >
                 PROCEED TO CHECKOUT
-              </Button>
+              </CommonButton>
 
               <button className="w-full text-center text-sm text-neutral-600 hover:text-neutral-900 transition-colors py-2">
                 Continue Shopping
@@ -391,7 +398,7 @@ const CartPage = () => {
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}

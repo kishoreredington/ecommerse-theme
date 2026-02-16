@@ -8,6 +8,7 @@ import { Order } from "../config/Database/Schemas/Orders.js";
 import { Favourite } from "../config/Database/Schemas/Favourite.js";
 import { User } from "../config/Database/Schemas/User.js";
 import { AddToCart } from "../config/Database/Schemas/AddToCart.js";
+import { kMaxLength } from "buffer";
 const BASE_ASSET_URL = process.env.ASSET_BASE_URL;
 export const getAllProducts = async (req, res) => {
     try {
@@ -266,37 +267,12 @@ export const addToCart = async (req, res) => {
 };
 export const removeFromCart = async (req, res) => {
     try {
-        const userId = Number(req.body.userId);
-        const variantId = Number(req.body.variantId);
+        const cartId = Number(req.body.cartId);
+        console.log("REMOVE FROM CART - cartId:", cartId);
         const cartRepo = AppDataSource.getRepository(AddToCart);
-        const userRepo = AppDataSource.getRepository(User);
-        const variantRepo = AppDataSource.getRepository(ProductVariant);
-        // ✅ check user
-        const user = await userRepo.findOne({ where: { id: userId } });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        // ✅ check variant
-        const variant = await variantRepo.findOne({ where: { id: variantId } });
-        if (!variant) {
-            return res.status(404).json({ message: "Product variant not found" });
-        }
-        const all = await cartRepo.find({
-            relations: ["user", "variant"],
-        });
-        console.log("ALL CART ITEMS:", all);
-        // ✅ find cart item
         const cartItem = await cartRepo.findOne({
-            where: {
-                user: {
-                    id: userId,
-                },
-                variant: {
-                    id: variantId,
-                },
-            },
+            where: { id: cartId },
         });
-        console.log("CART ITEM TO REMOVE:", cartItem);
         if (!cartItem) {
             return res.status(404).json({ message: "Cart item not found" });
         }

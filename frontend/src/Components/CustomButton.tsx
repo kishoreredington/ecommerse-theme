@@ -10,7 +10,13 @@ export default function CommonButton({
   ...props
 }: CommonButtonProps) {
   return (
-    <Button variant={variant} onClick={onClick} disabled={disabled} {...props}>
+    <Button
+      className="w-full"
+      variant={variant}
+      onClick={onClick}
+      disabled={disabled}
+      {...props}
+    >
       <Typography variant="body1">{children}</Typography>
     </Button>
   );
