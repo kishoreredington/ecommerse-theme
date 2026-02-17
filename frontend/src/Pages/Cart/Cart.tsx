@@ -238,23 +238,25 @@ const CartPage = () => {
 
                       {/* Item Total */}
                       <div className="mt-3 text-right flex ">
-                        <CommonButton
-                          onClick={() =>
-                            handleBuy({
-                              amount: total,
-                              addressId: 1,
-                              items: [
-                                {
-                                  variantId: item.variantId,
-                                  quantity: item.quantity,
-                                },
-                              ],
-                            })
-                          }
-                          disabled={cartItems.length === 0}
-                        >
-                          PROCEED FOT SINGLE ITEM
-                        </CommonButton>
+                        {cartProducts.data.length > 1 && (
+                          <CommonButton
+                            onClick={() =>
+                              handleBuy({
+                                amount: total,
+                                addressId: 1,
+                                items: [
+                                  {
+                                    variantId: item.variantId,
+                                    quantity: item.quantity,
+                                  },
+                                ],
+                              })
+                            }
+                            disabled={cartItems.length === 0}
+                          >
+                            PROCEED FOT SINGLE ITEM
+                          </CommonButton>
+                        )}
                         <Typography className="text-sm text-neutral-600">
                           Subtotal:{"   "}
                           <span className="font-medium text-neutral-900">
@@ -360,7 +362,7 @@ const CartPage = () => {
                 }
                 disabled={cartItems.length === 0}
               >
-                PROCEED TO CHECKOUT
+                PROCEED WHOLE ITEM
               </CommonButton>
 
               <button className="w-full text-center text-sm text-neutral-600 hover:text-neutral-900 transition-colors py-2">

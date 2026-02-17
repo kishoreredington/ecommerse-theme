@@ -1,7 +1,6 @@
 import { Typography } from "@mui/material";
 
 export default function ProductItem({ item }) {
-  console.log("CHECKING THE PRODUCT URL", item);
   return (
     <div className="flex gap-4">
       <div className="w-28 h-28 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">

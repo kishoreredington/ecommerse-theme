@@ -54,6 +54,8 @@ export default function OrderDetails() {
     );
   }
 
+  console.log("Formatted Orders:", formattedOrders);
+
   return (
     <div className="w-full bg-gray-50 mt-3">
       {formattedOrders.map((orderData) => (

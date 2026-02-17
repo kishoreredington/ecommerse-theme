@@ -15,13 +15,10 @@ export const getAllProducts = async (req, res) => {
         const userId = Number(req.query.userId) || 1; // later from auth token
         const productRepo = AppDataSource.getRepository(Product);
         const favRepo = AppDataSource.getRepository(Favourite);
-        // ✅ Fetch products
         const products = await productRepo.find({
             relations: ["variants"],
         });
-        // default: nothing favourited
         let favProductIds = new Set();
-        // ✅ if user logged in, fetch favourites
         if (userId) {
             const favourites = await favRepo.find({
                 where: { user: { id: userId } },
@@ -29,7 +26,6 @@ export const getAllProducts = async (req, res) => {
             });
             favProductIds = new Set(favourites.map((fav) => fav.product.id));
         }
-        // ✅ attach flag
         const data = products.map((product) => {
             return {
                 ...product,
@@ -37,14 +33,12 @@ export const getAllProducts = async (req, res) => {
                 productUrl: `${BASE_ASSET_URL}/products/${product.id}/${product.productImage}`,
             };
         });
-        console.log("users favourite", data);
         return res.status(200).json({
             count: data.length,
             data,
         });
     }
     catch (error) {
-        console.error("Error fetching products:", error);
         return res.status(500).json({
             message: "Failed to fetch products",
         });
@@ -159,6 +153,7 @@ export const getAllUserOrders = async (req, res) => {
                 },
             })),
         }));
+        console.log("RAW ORDERS FROM DB ============================>:", ordersWithProductUrl);
         return res.status(200).json({
             message: "Orders fetched successfully",
             data: ordersWithProductUrl,

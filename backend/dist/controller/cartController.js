@@ -18,7 +18,6 @@ export const createOrder = async (req, res) => {
     const addressRepo = AppDataSource.getRepository(Address);
     try {
         const { addressId, items } = req.body;
-        // basic validation
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: "Items are required" });
         }
@@ -28,13 +27,11 @@ export const createOrder = async (req, res) => {
                 where: { id: item.variantId },
                 relations: { product: true },
             });
-            console.log(variant?.price);
             if (!variant)
                 throw new Error("Variant not found");
             if (variant.stock < item.quantity) {
                 throw new Error(`Insufficient stock for ${variant.product.name}`);
             }
-            // price comes from DB, not request
             totalPrice += Number(variant.price) * item.quantity;
         }
         const options = {
