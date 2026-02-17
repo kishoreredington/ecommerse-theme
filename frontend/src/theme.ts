@@ -11,7 +11,7 @@ declare module "@mui/material/Button" {
 
 const theme = createTheme({
   typography: {
-    fontFamily: `"Bodoni Moda", serif`,
+    fontFamily: `"Montserrat", sans-serif`,
   },
 
   components: {

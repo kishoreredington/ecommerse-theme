@@ -8,10 +8,14 @@ import PrefetchAllProduct from "./Pages/ProductDetails/PrefetchAllProducts";
 import Order from "./Pages/Order/Order";
 import Cart from "./Pages/Cart/Cart";
 import PrefetchCartProducts from "./Pages/ProductDetails/PrefetchCartProducts";
+import Login from "./Pages/Auth/Login";
+import Signup from "./Pages/Auth/Signup";
 
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />}></Route>
+      <Route path="/sign-up" element={<Signup />}></Route>
       <Route element={<Layout />}>
         <Route element={<PrefetchCartProducts />}>
           <Route element={<PrefetchAllProduct />}>
