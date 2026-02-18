@@ -153,7 +153,6 @@ export const getAllUserOrders = async (req, res) => {
                 },
             })),
         }));
-        console.log("RAW ORDERS FROM DB ============================>:", ordersWithProductUrl);
         return res.status(200).json({
             message: "Orders fetched successfully",
             data: ordersWithProductUrl,

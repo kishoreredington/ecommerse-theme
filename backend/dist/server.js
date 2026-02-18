@@ -2,10 +2,13 @@ import express from "express";
 import { AppDataSource } from "./config/Database/DBconfig.js";
 import { cartRouter } from "./route/cart.js";
 import { productRouter } from "./route/product.js";
+import { userRouter } from "./route/user.js";
 import "reflect-metadata";
 import cors from "cors";
 import path from "path";
+import cookieParser from "cookie-parser";
 const app = express();
+app.use(cookieParser());
 app.use(cors({
     origin: ["http://localhost:5173", "http://192.168.1.10:5173"],
 }));
@@ -18,6 +21,7 @@ app.use("/cart/webhook-payment", express.raw({ type: "application/json" }), asyn
 app.use(express.json());
 app.use("/cart", cartRouter);
 app.use("/products", productRouter);
+app.use("/user", userRouter);
 AppDataSource.initialize()
     .then(() => {
     console.log("Data Source has been initialized!");
