@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, Search } from "lucide-react";
 import { Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks/stateHook";
 import { productApiSlices } from "../Pages/ProductDetails/productApiSlice";
 
@@ -54,10 +54,12 @@ const Header = () => {
 
           {/* Center Section - Logo */}
           <div className="flex items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-black rounded-full"></div>
-              <span className="text-xl font-semibold text-gray-900">Zen</span>
-            </div>
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 bg-black rounded-full"></div>
+                <span className="text-xl font-semibold text-gray-900">Zen</span>
+              </div>
+            </Link>
           </div>
 
           <div className="flex items-center space-x-6">

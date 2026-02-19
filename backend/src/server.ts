@@ -32,7 +32,7 @@ app.use(express.json());
 
 app.use("/cart", cartRouter);
 app.use("/products", productRouter);
-app.use("/user", userRouter);
+app.use("/auth", userRouter);
 
 AppDataSource.initialize()
   .then(() => {

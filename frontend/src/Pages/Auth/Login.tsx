@@ -11,7 +11,6 @@ import {
   Alert,
   CircularProgress,
   Divider,
-  Link,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -19,6 +18,8 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const darkTheme = createTheme({
   palette: {
@@ -103,6 +104,8 @@ const styles = `
 const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
 
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -127,6 +130,8 @@ const Login = () => {
         message: "Welcome back!",
         severity: "success",
       });
+
+      navigate("/"); // Redirect to dashboard after successful login
     } catch (err) {
       setSnackbar({
         open: true,
@@ -319,7 +324,7 @@ const Login = () => {
             sx={{ display: "flex", justifyContent: "flex-end", mb: 4 }}
           >
             <Link
-              href="#"
+              to="/sign-up"
               underline="none"
               sx={{
                 color: "#7A7A8C",
@@ -375,7 +380,7 @@ const Login = () => {
               <Typography sx={{ color: "#7A7A8C", fontSize: "0.88rem" }}>
                 Don't have an account?{" "}
                 <Link
-                  href="#"
+                  to="/sign-up"
                   underline="none"
                   sx={{
                     color: "#E8C97E",

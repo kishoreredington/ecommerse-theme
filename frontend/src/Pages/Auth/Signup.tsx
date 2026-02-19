@@ -11,7 +11,6 @@ import {
   Alert,
   CircularProgress,
   Divider,
-  Link,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -20,6 +19,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Link, useNavigate } from "react-router-dom";
 
 const darkTheme = createTheme({
   palette: {
@@ -145,6 +145,8 @@ const Signup = () => {
     severity: "success",
   });
 
+  const navigate = useNavigate();
+
   const strength = getPasswordStrength(form.password);
 
   const handleChange = (e) => {
@@ -194,6 +196,8 @@ const Signup = () => {
         message: "Account created! Welcome to Zen.",
         severity: "success",
       });
+
+      navigate("/login");
     } catch (err) {
       setSnackbar({
         open: true,
@@ -524,14 +528,13 @@ const Signup = () => {
               <Typography sx={{ color: "#7A7A8C", fontSize: "0.88rem" }}>
                 Already have an account?{" "}
                 <Link
-                  href="#"
-                  underline="none"
-                  sx={{
-                    color: "#E8C97E",
-                    fontWeight: 600,
-                    transition: "opacity 0.2s",
-                    "&:hover": { opacity: 0.7 },
-                  }}
+                  to={"/login"}
+                  // sx={{
+                  //   color: "#E8C97E",
+                  //   fontWeight: 600,
+                  //   transition: "opacity 0.2s",
+                  //   "&:hover": { opacity: 0.7 },
+                  // }}
                 >
                   Sign in
                 </Link>
