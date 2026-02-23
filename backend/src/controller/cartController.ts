@@ -303,43 +303,343 @@ export const downloadInvoice = async (req: Request, res: Response) => {
     console.log("CHECKING TOTAL AMOUNT", order.totalAmount);
 
     const html = `
+    <!DOCTYPE html>
     <html>
       <head>
-        <title>Invoice</title>
+        <title>Invoice #${order.id}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <style>
-          body { font-family: Arial; }
-          table { width: 100%; border-collapse: collapse; }
-          td, th { border: 1px solid #ddd; padding: 8px; }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+          body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f5f5f5;
+            color: #111;
+            padding: 40px;
+          }
+    
+          .invoice-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+          }
+    
+          /* ── Header ── */
+          .invoice-header {
+            background: linear-gradient(180deg, #0b1626 0%, #050b15 100%);
+            color: white;
+            padding: 48px 48px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+          }
+    
+          .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+    
+          .brand-dot {
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+          }
+    
+          .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+          }
+    
+          .invoice-label {
+            text-align: right;
+          }
+    
+          .invoice-label h1 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 6px;
+          }
+    
+          .invoice-label .invoice-number {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+          }
+    
+          .invoice-label .invoice-date {
+            font-size: 12px;
+            opacity: 0.55;
+            margin-top: 6px;
+            letter-spacing: 1px;
+          }
+    
+          /* ── Info Bar ── */
+          .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 28px 48px;
+            border-bottom: 1px solid #ebebeb;
+            background: #fafafa;
+          }
+    
+          .info-block h4 {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 8px;
+          }
+    
+          .info-block p {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111;
+          }
+    
+          .info-block p.sub {
+            font-size: 12px;
+            font-weight: 400;
+            color: #777;
+            margin-top: 2px;
+          }
+    
+          /* ── Table ── */
+          .invoice-table {
+            padding: 36px 48px;
+          }
+    
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+    
+          thead tr {
+            border-bottom: 2px solid #111;
+          }
+    
+          thead th {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #111;
+            padding: 0 0 14px 0;
+            text-align: left;
+          }
+    
+          thead th.text-right { text-align: right; }
+    
+          tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+          }
+    
+          tbody td {
+            padding: 18px 0;
+            font-size: 13px;
+            color: #333;
+            font-weight: 400;
+            vertical-align: top;
+          }
+    
+          tbody td.text-right { text-align: right; }
+    
+          .product-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #111;
+            margin-bottom: 3px;
+          }
+    
+          .product-index {
+            font-size: 10px;
+            color: #bbb;
+            letter-spacing: 1px;
+          }
+    
+          /* ── Totals ── */
+          .invoice-totals {
+            padding: 0 48px 48px;
+            display: flex;
+            justify-content: flex-end;
+          }
+    
+          .totals-box {
+            width: 280px;
+          }
+    
+          .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 13px;
+            color: #555;
+            border-bottom: 1px solid #f0f0f0;
+          }
+    
+          .totals-row.total {
+            background: linear-gradient(180deg, #0b1626 0%, #050b15 100%);
+            color: white;
+            padding: 16px 20px;
+            margin-top: 8px;
+            border-bottom: none;
+          }
+    
+          .totals-row.total .label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+          }
+    
+          .totals-row.total .amount {
+            font-size: 20px;
+            font-weight: 800;
+          }
+    
+          /* ── Footer ── */
+          .invoice-footer {
+            background: linear-gradient(180deg, #0b1626 0%, #050b15 100%);
+            color: white;
+            padding: 24px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+    
+          .footer-badges {
+            display: flex;
+            gap: 24px;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+          }
+    
+          .footer-badges span::before {
+            content: "● ";
+            font-size: 6px;
+            vertical-align: middle;
+            margin-right: 4px;
+          }
+    
+          .footer-thank {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
+          }
         </style>
       </head>
       <body>
-        <h1>Invoice</h1>
-        <p>Order ID: ${order?.id}</p>
-        <p>Customer: ${order?.user?.name}</p>
-
-        <table>
-          <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Price</th>
-          </tr>
-          ${order?.orderItems
-            .map(
-              (item: any) => `
-            <tr>
-              <td>${item.variant.product.name}</td>
-              <td>${item.quantity}</td>
-              <td>${item.variant.price}</td>
-            </tr>
-          `,
-            )
-            .join("")}
-        </table>
-
-        <h3>Total: ₹${order?.totalAmount}</h3>
+        <div class="invoice-wrapper">
+    
+          <!-- Header -->
+          <div class="invoice-header">
+            <div class="brand">
+              <div class="brand-dot"></div>
+              <span class="brand-name">Zen</span>
+            </div>
+            <div class="invoice-label">
+              <h1>Invoice</h1>
+              <div class="invoice-number">#INV-${String(order.id).padStart(5, "0")}</div>
+              <div class="invoice-date">${new Date().toLocaleDateString(
+                "en-IN",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                },
+              )}</div>
+            </div>
+          </div>
+    
+          <!-- Info Bar -->
+          <div class="invoice-info">
+            <div class="info-block">
+              <h4>Billed To</h4>
+              <p>${order.user.name}</p>
+              <p class="sub">${order.user.email ?? ""}</p>
+            </div>
+            <div class="info-block" style="text-align:right;">
+              <h4>Order Reference</h4>
+              <p>#${order.id}</p>
+              <p class="sub">Status: Confirmed</p>
+            </div>
+          </div>
+    
+          <!-- Table -->
+          <div class="invoice-table">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px;">#</th>
+                  <th>Product</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Unit Price</th>
+                  <th class="text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.orderItems
+                  .map(
+                    (item: any, index: number) => `
+                  <tr>
+                    <td><span class="product-index">0${index + 1}</span></td>
+                    <td>
+                      <div class="product-name">${item.variant.product.name}</div>
+                      <div style="font-size:11px; color:#999; margin-top:2px; letter-spacing:1px;">${item.variant.size ?? ""}</div>
+                    </td>
+                    <td class="text-right">${item.quantity}</td>
+                    <td class="text-right">₹${Number(item.variant.price).toLocaleString("en-IN")}</td>
+                    <td class="text-right" style="font-weight:600;">₹${(item.quantity * Number(item.variant.price)).toLocaleString("en-IN")}</td>
+                  </tr>
+                `,
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+    
+          <!-- Totals -->
+          <div class="invoice-totals">
+            <div class="totals-box">
+              <div class="totals-row">
+                <span>Subtotal</span>
+                <span>₹${Number(order.totalAmount).toLocaleString("en-IN")}</span>
+              </div>
+              <div class="totals-row">
+                <span>Shipping</span>
+                <span style="color:#111; font-weight:600;">FREE</span>
+              </div>
+              <div class="totals-row total">
+                <span class="label">Total</span>
+                <span class="amount">₹${Number(order.totalAmount).toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Footer -->
+          <div class="invoice-footer">
+            <div class="footer-badges">
+              <span>Secure Checkout</span>
+              <span>Free Returns</span>
+            </div>
+            <div class="footer-thank">Thank you for your purchase</div>
+          </div>
+    
+        </div>
       </body>
     </html>
-  `;
+    `;
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();

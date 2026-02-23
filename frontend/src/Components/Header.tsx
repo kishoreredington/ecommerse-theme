@@ -83,7 +83,7 @@ const Header = () => {
               onClick={() => handleNavigate("orders")}
               className="bg-black gap-3 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center space-x-2"
             >
-              <Typography>Orders</Typography>
+              <Typography>ORDERS</Typography>
             </button>
           </div>
         </div>
