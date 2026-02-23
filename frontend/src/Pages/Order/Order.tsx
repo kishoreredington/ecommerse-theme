@@ -16,7 +16,7 @@ export default function OrderDetails() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `invoice-${cartId}.pdf`;
+      a.download = `Invoice-zen-${cartId}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();

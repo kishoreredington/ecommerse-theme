@@ -10,6 +10,7 @@ import { OrderItem } from "../config/Database/Schemas/Order_Items.js";
 import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
 import { Address } from "../config/Database/Schemas/Adress.js";
 import puppeteer from "puppeteer";
+import { html } from "../utils/paymentHTML.js";
 export const createOrder = async (req, res) => {
     const orderRepo = AppDataSource.getRepository(Order);
     const paymentRepo = AppDataSource.getRepository(Payment);
@@ -226,8 +227,6 @@ export const downloadInvoice = async (req, res) => {
     const orderRepo = AppDataSource.getRepository(Order);
     const { orderId } = req.params;
     const user_id = 1;
-    console.log("ORDER ID:", orderId);
-    console.log("USER ID:", user_id);
     try {
         const order = await orderRepo.findOne({
             where: {
@@ -236,12 +235,15 @@ export const downloadInvoice = async (req, res) => {
                     id: user_id,
                 },
             },
-            relations: { user: true, orderItems: { variant: { product: true } } },
+            relations: {
+                user: true,
+                address: true,
+                orderItems: { variant: { product: true } },
+            },
         });
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
         }
-        console.log("CHECKING TOTAL AMOUNT", order.totalAmount);
         const html = `
     <!DOCTYPE html>
     <html>
@@ -500,18 +502,28 @@ export const downloadInvoice = async (req, res) => {
           </div>
     
           <!-- Info Bar -->
-          <div class="invoice-info">
-            <div class="info-block">
-              <h4>Billed To</h4>
-              <p>${order.user.name}</p>
-              <p class="sub">${order.user.email ?? ""}</p>
-            </div>
-            <div class="info-block" style="text-align:right;">
-              <h4>Order Reference</h4>
-              <p>#${order.id}</p>
-              <p class="sub">Status: Confirmed</p>
-            </div>
-          </div>
+<div class="invoice-info">
+  <div class="info-block">
+    <h4>Billed To</h4>
+    <p>${order.user.name}</p>
+    <p class="sub">${order.user.email ?? ""}</p>
+  </div>
+
+  <!-- Add this block -->
+  <div class="info-block" style="text-align:center;">
+    <h4>Delivery Address</h4>
+    <p style="font-weight:500;">${order.address.line1}</p>
+    <p class="sub">${order.address.city}, ${order.address.state}</p>
+    <p class="sub">${order.address.pincode}, ${order.address.country}</p>
+  </div>
+
+  <div class="info-block" style="text-align:right;">
+    <h4>Order Reference</h4>
+    <p>#${order.id}</p>
+    <p class="sub">Status: Confirmed</p>
+  </div>
+</div>
+
     
           <!-- Table -->
           <div class="invoice-table">
@@ -575,8 +587,16 @@ export const downloadInvoice = async (req, res) => {
       </body>
     </html>
     `;
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage", // important for low-memory servers
+            ],
+        });
         const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: "networkidle0" }); // ← here
         await page.setContent(html);
         const pdfBuffer = await page.pdf({
             format: "A4",
