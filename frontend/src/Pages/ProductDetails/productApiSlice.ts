@@ -59,10 +59,18 @@ export const productApiSlices = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Cart"],
     }),
+    downloadInvoice: builder.mutation({
+      query: ({ orderId }) => ({
+        url: `/cart/invoice/${orderId}`,
+        method: "GET",
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
   }),
 });
 
 export const {
+  useDownloadInvoiceMutation,
   useGetAllProductsQuery,
   useGetAllOrdersQuery,
   useGetSpecificProductQuery,

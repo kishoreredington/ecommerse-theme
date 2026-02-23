@@ -3,10 +3,28 @@ import { useGetAllOrdersQuery } from "../ProductDetails/productApiSlice";
 import { Typography } from "@mui/material";
 import ProductItem from "./ProductItem";
 import HorizontalLinearAlternativeLabelStepper from "../../Components/Stepper";
-import { OrderStatus } from "../../type";
+
+import { useDownloadInvoiceMutation } from "../ProductDetails/productApiSlice";
 export default function OrderDetails() {
   const { data, isLoading, isError } = useGetAllOrdersQuery(undefined);
 
+  const [downloadInvoice] = useDownloadInvoiceMutation();
+
+  const handleDownloadInvoice = async (cartId: number) => {
+    try {
+      const blob = await downloadInvoice({ orderId: Number(cartId) }).unwrap();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `invoice-${cartId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+    }
+  };
   // ✅ Loading
   if (isLoading) {
     return <div className="p-6">Loading orders...</div>;
@@ -19,7 +37,7 @@ export default function OrderDetails() {
 
   // ✅ Transform backend response → UI format
   const formattedOrders =
-    data?.data?.map((order) => ({
+    data?.data?.map((order: any) => ({
       orderNumber: order.id,
       products: order.orderItems.length,
       customer: "You",
@@ -54,11 +72,9 @@ export default function OrderDetails() {
     );
   }
 
-  console.log("Formatted Orders:", formattedOrders);
-
   return (
     <div className="w-full bg-gray-50 mt-3">
-      {formattedOrders.map((orderData) => (
+      {formattedOrders.map((orderData: any) => (
         <div
           key={orderData.orderNumber}
           className="w-full mx-auto bg-white rounded-2xl shadow-sm p-8 mb-6"
@@ -76,15 +92,17 @@ export default function OrderDetails() {
             </div>
 
             <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <Download size={18} />
-                <Typography variant="body2" className="font-medium">
+              <button
+                className="flex items-center gap-2 px-2 py-1 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => handleDownloadInvoice(orderData.orderNumber)}
+              >
+                <Download size={18} className="text-gray-500" />
+                <Typography
+                  variant="body2"
+                  className="font-medium text-gray-500 text-xs"
+                >
                   Download invoice
                 </Typography>
-              </button>
-
-              <button className="p-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <MoreVertical size={18} />
               </button>
             </div>
           </div>

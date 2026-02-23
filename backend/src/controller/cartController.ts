@@ -9,6 +9,7 @@ import { Payment, PaymentStatus } from "../config/Database/Schemas/Payment.js";
 import { OrderItem } from "../config/Database/Schemas/Order_Items.js";
 import { ProductVariant } from "../config/Database/Schemas/Product_varient.js";
 import { Address } from "../config/Database/Schemas/Adress.js";
+import puppeteer from "puppeteer";
 
 export const createOrder = async (req: Request, res: Response) => {
   const orderRepo = AppDataSource.getRepository(Order);
@@ -139,8 +140,6 @@ export const createOrder = async (req: Request, res: Response) => {
 export const verifyPayment = async (req: Request, res: Response) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
     req.body;
-
-  console.log("CHECKING PAYMENT RESULT");
 
   const isValid = PaymentGateway.getInstance().verifyPayment(
     razorpay_order_id,
@@ -275,5 +274,93 @@ export const webhookPayment = async (req: Request, res: Response) => {
       received: true,
       error: "Processing failed",
     });
+  }
+};
+
+export const downloadInvoice = async (req: Request, res: Response) => {
+  const orderRepo = AppDataSource.getRepository(Order);
+  const { orderId } = req.params;
+  const user_id = 1;
+
+  console.log("ORDER ID:", orderId);
+  console.log("USER ID:", user_id);
+
+  try {
+    const order = await orderRepo.findOne({
+      where: {
+        id: Number(orderId),
+        user: {
+          id: user_id,
+        },
+      },
+      relations: { user: true, orderItems: { variant: { product: true } } },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    console.log("CHECKING TOTAL AMOUNT", order.totalAmount);
+
+    const html = `
+    <html>
+      <head>
+        <title>Invoice</title>
+        <style>
+          body { font-family: Arial; }
+          table { width: 100%; border-collapse: collapse; }
+          td, th { border: 1px solid #ddd; padding: 8px; }
+        </style>
+      </head>
+      <body>
+        <h1>Invoice</h1>
+        <p>Order ID: ${order?.id}</p>
+        <p>Customer: ${order?.user?.name}</p>
+
+        <table>
+          <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+          </tr>
+          ${order?.orderItems
+            .map(
+              (item: any) => `
+            <tr>
+              <td>${item.variant.product.name}</td>
+              <td>${item.quantity}</td>
+              <td>${item.variant.price}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </table>
+
+        <h3>Total: ₹${order?.totalAmount}</h3>
+      </body>
+    </html>
+  `;
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(html);
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=invoice-${order.id}.html`,
+    );
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Error downloading invoice:", error);
+    return res
+      .status(500)
+      .json({ message: "Error downloading invoice", error });
   }
 };
