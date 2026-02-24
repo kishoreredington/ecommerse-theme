@@ -65,7 +65,9 @@ const Header = () => {
           <div className="flex items-center space-x-6">
             <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
               <User className="w-5 h-5" />
-              <Typography>ACCOUNT</Typography>
+              <Link to={"/account"}>
+                <Typography>ACCOUNT</Typography>
+              </Link>
             </button>
             <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
               <Search className="w-5 h-5" />
