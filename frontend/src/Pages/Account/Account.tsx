@@ -1,3 +1,6 @@
+import useAuth from "../../app/hooks/useAuth";
+import { useSelector } from "react-redux";
+import { selectCurrentToken } from "../Auth/authSlice";
 import { useState } from "react";
 import {
   Box,
@@ -205,12 +208,14 @@ export default function Account() {
   const [editMode, setEditMode] = useState(false);
   const [savedSnack, setSavedSnack] = useState(false);
 
+  const { email, userId, userName, role, address, phoneNumber } = useAuth();
+
   const allPrefs = [...prefSections.Notifications, ...prefSections.Privacy];
   const [toggles, setToggles] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(allPrefs.map((p) => [p.id, p.default])),
   );
 
-  const initials = `${mockUser.firstName[0]}${mockUser.lastName[0]}`;
+  const initials = `${userName}${mockUser.lastName[0]}`;
 
   return (
     <Box
@@ -256,7 +261,7 @@ export default function Account() {
               mb: 2,
             }}
           >
-            {initials}
+            {userName[0]}
           </Avatar>
 
           <Typography
@@ -267,9 +272,9 @@ export default function Account() {
               mb: 0.5,
             }}
           >
-            {mockUser.firstName} {mockUser.lastName}
+            {userName}
           </Typography>
-          <Typography sx={{ ...labelSx, mb: 3 }}>{mockUser.tier}</Typography>
+          <Typography sx={{ ...labelSx, mb: 3 }}>{role}</Typography>
 
           <Divider sx={{ mb: 3 }} />
 
@@ -391,10 +396,9 @@ export default function Account() {
               {/* Fields */}
               <Grid container spacing={3} sx={{ mb: 4 }}>
                 {[
-                  { label: "First Name", value: mockUser.firstName, xs: 6 },
-                  { label: "Last Name", value: mockUser.lastName, xs: 6 },
-                  { label: "Email Address", value: mockUser.email, xs: 12 },
-                  { label: "Phone Number", value: mockUser.phone, xs: 6 },
+                  { label: "User Name", value: userName, xs: 6 },
+                  { label: "Email Address", value: email, xs: 12 },
+                  { label: "Phone Number", value: phoneNumber, xs: 6 },
                 ].map(({ label, value, xs }) => (
                   <Grid item xs={xs} key={label}>
                     <Typography sx={{ ...labelSx, mb: 0.5 }}>

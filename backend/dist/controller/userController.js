@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 export const signUp = async (req, res) => {
     const userRepo = AppDataSource.getRepository(User);
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, phoneNumber } = req.body;
         // 1️⃣ Validate input
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -33,6 +33,7 @@ export const signUp = async (req, res) => {
             name,
             email,
             password,
+            phoneNumber,
         });
         await userRepo.save(user);
         // 5️⃣ Remove password before sending response
@@ -62,6 +63,9 @@ export const login = async (req, res) => {
         // 2️⃣ Check if user exists
         const user = await userRepo.findOne({
             where: { email },
+            relations: {
+                addresses: true,
+            },
         });
         if (!user) {
             return res.status(401).json({
@@ -76,7 +80,16 @@ export const login = async (req, res) => {
             });
         }
         // 4️⃣ Generate tokens
-        const accessToken = jwt.sign({ userId: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+        const accessToken = jwt.sign({
+            UserInfo: {
+                userId: user.id,
+                userName: user.name,
+                email: user.email,
+                address: user.addresses,
+                joinedDate: user.createdAt,
+                phoneNumber: user.phoneNumber,
+            },
+        }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
         // 5️⃣ Set refresh token in HTTP-only cookie
         res.cookie("refreshToken", refreshToken, {

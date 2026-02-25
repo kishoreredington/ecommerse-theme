@@ -8,7 +8,7 @@ export const signUp = async (req: Request, res: Response) => {
   const userRepo = AppDataSource.getRepository(User);
 
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phoneNumber } = req.body;
 
     // 1️⃣ Validate input
     if (!name || !email || !password) {
@@ -40,6 +40,7 @@ export const signUp = async (req: Request, res: Response) => {
       name,
       email,
       password,
+      phoneNumber,
     });
 
     await userRepo.save(user);
@@ -76,6 +77,9 @@ export const login = async (req: Request, res: Response) => {
     // 2️⃣ Check if user exists
     const user = await userRepo.findOne({
       where: { email },
+      relations: {
+        addresses: true,
+      },
     });
 
     if (!user) {
@@ -95,7 +99,16 @@ export const login = async (req: Request, res: Response) => {
 
     // 4️⃣ Generate tokens
     const accessToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      {
+        UserInfo: {
+          userId: user.id,
+          userName: user.name,
+          email: user.email,
+          address: user.addresses,
+          joinedDate: user.createdAt,
+          phoneNumber: user.phoneNumber,
+        },
+      },
       process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: "15m" },
     );

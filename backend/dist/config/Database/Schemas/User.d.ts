@@ -7,6 +7,7 @@ export declare class User {
     name: string;
     email: string;
     password: string;
+    phoneNumber: number;
     createdAt: Date;
     addresses: Relation<Address[]>;
     favourites: Relation<Favourite[]>;

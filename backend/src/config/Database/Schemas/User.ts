@@ -28,6 +28,9 @@ export class User {
   @Column()
   password!: string;
 
+  @Column({ nullable: true })
+  phoneNumber!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

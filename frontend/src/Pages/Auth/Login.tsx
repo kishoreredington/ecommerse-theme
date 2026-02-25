@@ -20,7 +20,8 @@ import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import { setCredentials } from "./authSlice";
+import { useDispatch } from "react-redux";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -103,6 +104,7 @@ const styles = `
 // ─── Component ────────────────────────────────────────────────────────────────
 const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -124,12 +126,11 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      await login({ email: form.email, password: form.password }).unwrap();
-      setSnackbar({
-        open: true,
-        message: "Welcome back!",
-        severity: "success",
-      });
+      const { message, accessToken } = await login({
+        email: form.email,
+        password: form.password,
+      }).unwrap();
+      dispatch(setCredentials(accessToken));
 
       navigate("/"); // Redirect to dashboard after successful login
     } catch (err) {

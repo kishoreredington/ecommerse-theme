@@ -70,3 +70,14 @@ export interface GetCartResponse {
   message: string;
   data: CartItem[];
 }
+
+export interface UserInfo {
+  userId: number | string;
+  email: string;
+  address: any[];
+  userName: string;
+  phoneNumber: number;
+}
+export interface UserInfoToken {
+  UserInfo: UserInfo;
+}

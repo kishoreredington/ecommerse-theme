@@ -18,6 +18,7 @@ let User = class User {
     name;
     email;
     password;
+    phoneNumber;
     createdAt;
     addresses;
     favourites;
@@ -44,6 +45,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
+__decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", Number)
+], User.prototype, "phoneNumber", void 0);
 __decorate([
     CreateDateColumn(),
     __metadata("design:type", Date)
