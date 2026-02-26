@@ -139,3 +139,72 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const cookies = req.cookies;
+
+    if (!cookies?.refreshToken) {
+      return res.status(401).json({
+        message: "No refresh token found",
+      });
+    }
+
+    const refreshToken = cookies.refreshToken;
+
+    // 1️⃣ Verify refresh token
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET as string,
+      async (err: any, decoded: any) => {
+        if (err) {
+          return res.status(403).json({
+            message: "Invalid or expired refresh token",
+          });
+        }
+
+        // 2️⃣ Fetch user from DB
+        const userRepo = AppDataSource.getRepository(User);
+
+        const user = await userRepo.findOne({
+          where: { id: decoded.userId },
+          relations: {
+            addresses: true,
+          },
+        });
+
+        if (!user) {
+          return res.status(401).json({
+            message: "User not found",
+          });
+        }
+
+        // 3️⃣ Create new access token
+        const newAccessToken = jwt.sign(
+          {
+            UserInfo: {
+              userId: user.id,
+              userName: user.name,
+              email: user.email,
+              address: user.addresses,
+              joinedDate: user.createdAt,
+              phoneNumber: user.phoneNumber,
+            },
+          },
+          process.env.ACCESS_TOKEN_SECRET as string,
+          { expiresIn: "15m" },
+        );
+
+        return res.status(200).json({
+          accessToken: newAccessToken,
+        });
+      },
+    );
+  } catch (error) {
+    console.error("Refresh Token Error:", error);
+
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+};

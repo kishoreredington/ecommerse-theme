@@ -7,6 +7,7 @@ import "reflect-metadata";
 import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
+import { verifyJWT } from "./utils/middleware.js";
 const app = express();
 app.use(cookieParser());
 app.use(cors({
@@ -19,9 +20,10 @@ app.use("/cart/webhook-payment", express.raw({ type: "application/json" }), asyn
     return webhookPayment(req, res);
 });
 app.use(express.json());
+app.use("/auth", userRouter);
+app.use(verifyJWT);
 app.use("/cart", cartRouter);
 app.use("/products", productRouter);
-app.use("/auth", userRouter);
 AppDataSource.initialize()
     .then(() => {
     console.log("Data Source has been initialized!");
